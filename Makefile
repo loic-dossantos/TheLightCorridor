@@ -2,6 +2,7 @@ CC		= gcc
 CFLAGS	= -Wall -O2 -g
 LDFLAGS	= 
 ifeq ($(OS),Windows_NT)
+	CFLAGS += -I"C:\Users\rikud\Documents\librairies\glfw-3.3.8.bin.WIN64\include"
 	LDFLAGS += -L"C:\Users\rikud\Documents\librairies\glfw-3.3.8.bin.WIN64\include"
 endif
 LDFLAGS	+= -lglfw -lGLU -lGL -lm
@@ -49,7 +50,7 @@ endif
 
 $(BINDIR)$(EXEC): $(OBJ)
 	$(MKDIR_BIN)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS)
 
 $(OBJDIR)Main.o: $(SRCDIR)Main.c
 
