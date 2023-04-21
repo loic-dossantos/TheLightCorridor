@@ -13,7 +13,7 @@ OBJ = $(OBJDIR)Main.o
 
 $(BINDIR)$(EXEC): $(OBJ)
 	@mkdir -p $(BINDIR)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 $(OBJDIR)Main.o: $(SRCDIR)Main.c
 
