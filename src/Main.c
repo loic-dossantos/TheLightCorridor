@@ -3,19 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-/* Window properties */
-static const unsigned int WINDOW_WIDTH = 1000;
-static const unsigned int WINDOW_HEIGHT = 800;
-static const char WINDOW_TITLE[] = "TD03 Ex01";
-static float aspectRatio = 1.0;
-
-/* Minimal time wanted between two images */
-static const double FRAMERATE_IN_SECONDS = 1. / 30.;
-
-/* Virtual windows space */
-// Space is defined in interval -1 and 1 on x and y axes
-static const float GL_VIEW_SIZE = 20.;
-
+#include "Racket.h"
 
 /* Error handling function */
 void onError(int error, const char* description) {
@@ -66,17 +54,23 @@ void drawSquare(double side) {
     glEnd();
 }
 
-void update_screen(GLFWwindow* window) {
+void drawRacket(GLFWwindow* window, Racket racket) {
+    glTranslatef(racket.x, racket.y, 0);
+    glColor3f(1,1,1);
+    drawSquare(racket.side);
+    glLoadIdentity();
+}
+
+void update_screen(GLFWwindow* window, Racket* racket) {
     double x, y, x_racket, y_racket;
 
     glfwGetCursorPos(window, &x, &y);
-    x_racket = (x * GL_VIEW_SIZE / WINDOW_WIDTH) - (GL_VIEW_SIZE / 2.);
+    x_racket = ((x * GL_VIEW_SIZE / WINDOW_WIDTH) - (GL_VIEW_SIZE / 2.)) * aspectRatio;
     y_racket = -((y * GL_VIEW_SIZE / WINDOW_HEIGHT) - (GL_VIEW_SIZE / 2.));
-    printf("x: %lf, y: %lf | xr: %lf, yr: %f\n", x, y, x_racket, y_racket);
-    glTranslatef(x_racket, y_racket, 0);
-    glColor3f(1,1,1);
-    drawSquare(1);
-    glLoadIdentity();
+
+    update_racket(racket, x_racket, y_racket);
+
+    drawRacket(window, *racket);
 }
 
 int main(int argc, char const *argv[]) {
@@ -106,6 +100,8 @@ int main(int argc, char const *argv[]) {
 
     glPointSize(4.0);
 
+    Racket racket = init_racket(4.);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         /* Get time (in second) at loop beginning */
@@ -118,7 +114,7 @@ int main(int argc, char const *argv[]) {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        update_screen(window);
+        update_screen(window, &racket);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
