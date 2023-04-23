@@ -6,8 +6,27 @@
 #include "Racket.h"
 #include "Geometry.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+/* Game variable */
+
 static int timeStep = 0;
 static int clicked = 0;
+static int interacted = 0;
+
+typedef enum
+{
+    MENU,
+    JEU,
+    FIN
+} interface;
+
+interface currentScreen = MENU;
+
+/* TEXTURE Declaration */
+unsigned char *texture_data1;
+GLuint texture_id;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -47,6 +66,9 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         case GLFW_KEY_A:
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
+            stbi_image_free(texture_data1);
+            glDeleteTextures(1, &texture_id);
+            glDisable(GL_TEXTURE_2D);
             break;
         default:
             fprintf(stdout, "Touche non gérée\n");
@@ -89,8 +111,6 @@ void update_screen(GLFWwindow *window, Racket *racket)
 
 void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
 {
-    double a;
-    double b;
     if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
         clicked = 1;
@@ -129,6 +149,30 @@ int main(int argc, char const *argv[])
 
     glfwSetMouseButtonCallback(window, mouse_click_callback);
 
+    /* Texture */
+    int x, y, n;
+    texture_data1 = stbi_load("./ressources/quitButton.jpg", &x, &y, &n, 0);
+    if (texture_data1 == NULL)
+    {
+        fprintf(stdout, "EROR texture non chargé\n");
+        glfwTerminate();
+        return -1;
+    }
+    else
+    {
+        fprintf(stdout, " texture chargé\n");
+    }
+
+    // gen + bind texture object
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // upload texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data1);
+    glEnable(GL_TEXTURE_2D);
+
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     glPointSize(4.0);
@@ -148,12 +192,48 @@ int main(int argc, char const *argv[])
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        timeStep++;
-        fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
-        update_screen(window, &racket);
+        /* RENDER */
+        switch (currentScreen)
+        {
+        case MENU:
 
-        /* RESET ACTION */
-        // clicked = 0;
+            glBegin(GL_QUADS);
+            glEnable(GL_TEXTURE_2D);
+
+            // glColor3f(0, 1, 1);
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+
+            glTexCoord2f(0, 0);
+            glVertex2f(-5.f, -2.f);
+
+            glTexCoord2f(0, 1);
+            glVertex2f(5.f, -2.f);
+
+            glTexCoord2f(1, 1);
+            glVertex2f(5.f, -5.f);
+
+            glTexCoord2f(1, 0);
+            glVertex2f(-5.f, -5.f);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glEnd();
+            break;
+        case JEU:
+
+            fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
+            update_screen(window, &racket);
+            if (!interacted) // Si la racket n'interragit pas avec la balle
+            {
+                timeStep++;
+            }
+            else
+            {
+            }
+            break;
+        case FIN:
+            break;
+        }
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
