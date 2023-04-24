@@ -150,8 +150,11 @@ int main(int argc, char const *argv[])
     glfwSetMouseButtonCallback(window, mouse_click_callback);
 
     /* Texture */
-    int x, y, n;
-    texture_data1 = stbi_load("./ressources/quitButton.jpg", &x, &y, &n, 0);
+
+    // Tells how texture is packed
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    int x1, y1, n1;
+    texture_data1 = stbi_load("./ressources/playButton.jpg", &x1, &y1, &n1, 0);
     if (texture_data1 == NULL)
     {
         fprintf(stdout, "EROR texture non chargé\n");
@@ -166,11 +169,8 @@ int main(int argc, char const *argv[])
     // gen + bind texture object
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // upload texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x1, y1, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data1);
     glEnable(GL_TEXTURE_2D);
 
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -196,24 +196,26 @@ int main(int argc, char const *argv[])
         switch (currentScreen)
         {
         case MENU:
+            glClearColor(0.0, 0.0, 0.2, 0.0);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             glBegin(GL_QUADS);
             glEnable(GL_TEXTURE_2D);
 
-            // glColor3f(0, 1, 1);
             glBindTexture(GL_TEXTURE_2D, texture_id);
 
             glTexCoord2f(0, 0);
-            glVertex2f(-5.f, -2.f);
-
-            glTexCoord2f(0, 1);
-            glVertex2f(5.f, -2.f);
-
-            glTexCoord2f(1, 1);
-            glVertex2f(5.f, -5.f);
+            glVertex2f(-3.f, -1.f);
 
             glTexCoord2f(1, 0);
-            glVertex2f(-5.f, -5.f);
+            glVertex2f(3.f, -1.f);
+
+            glTexCoord2f(1, 1);
+            glVertex2f(3.f, -3.f);
+
+            glTexCoord2f(0, 1);
+            glVertex2f(-3.f, -3.f);
+
             glBindTexture(GL_TEXTURE_2D, 0);
 
             glEnd();
