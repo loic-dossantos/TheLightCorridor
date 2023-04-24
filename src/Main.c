@@ -1,13 +1,15 @@
-#include <stdio.h>
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 #include "Racket.h"
-#include "Geometry.h"
+#include "TextureControl.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#ifndef STBI_NO_STDIO
+#include <stdio.h>
+#endif // STBI_NO_STDIO
+
+/* TEXTURE Declaration */
+#define nbTextures 1
+GLuint texture_ids[nbTextures];
+textureData *images_datas;
 
 /* Game variable */
 
@@ -23,10 +25,6 @@ typedef enum
 } interface;
 
 interface currentScreen = MENU;
-
-/* TEXTURE Declaration */
-unsigned char *texture_data1;
-GLuint texture_id;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -66,8 +64,7 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         case GLFW_KEY_A:
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
-            stbi_image_free(texture_data1);
-            glDeleteTextures(1, &texture_id);
+            freeTextures(texture_ids, images_datas, nbTextures);
             glDisable(GL_TEXTURE_2D);
             break;
         default:
@@ -150,28 +147,13 @@ int main(int argc, char const *argv[])
     glfwSetMouseButtonCallback(window, mouse_click_callback);
 
     /* Texture */
-
-    // Tells how texture is packed
+    // Tells how texture is packed (fixed inclined textures problem)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    int x1, y1, n1;
-    texture_data1 = stbi_load("./ressources/playButton.jpg", &x1, &y1, &n1, 0);
-    if (texture_data1 == NULL)
-    {
-        fprintf(stdout, "EROR texture non chargé\n");
-        glfwTerminate();
-        return -1;
-    }
-    else
-    {
-        fprintf(stdout, " texture chargé\n");
-    }
 
-    // gen + bind texture object
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x1, y1, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data1);
+    images_datas = prepareTexture(texture_ids, nbTextures);
+
     glEnable(GL_TEXTURE_2D);
+    /*  ----  */
 
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -202,7 +184,7 @@ int main(int argc, char const *argv[])
             glBegin(GL_QUADS);
             glEnable(GL_TEXTURE_2D);
 
-            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glBindTexture(GL_TEXTURE_2D, texture_ids[0]);
 
             glTexCoord2f(0, 0);
             glVertex2f(-3.f, -1.f);
