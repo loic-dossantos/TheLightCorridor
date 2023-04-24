@@ -2,8 +2,8 @@
 #define __WINDOWCONFIG_H__
 
 /* Window properties */
-static const unsigned int WINDOW_WIDTH = 1000;
-static const unsigned int WINDOW_HEIGHT = 800;
+static const unsigned int WINDOW_WIDTH = 1200;
+static const unsigned int WINDOW_HEIGHT = 600;
 static const char WINDOW_TITLE[] = "TD03 Ex01";
 static float aspectRatio = WINDOW_WIDTH / (float) WINDOW_HEIGHT;
 

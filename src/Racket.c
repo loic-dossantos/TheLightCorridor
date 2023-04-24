@@ -12,10 +12,10 @@ Racket init_racket(double side) {
 }
 
 void keep_racket_in_window(Racket* racket) {
-	racket->x = MAX(racket->x, (-GL_VIEW_SIZE / 2.) * aspectRatio + (racket->side / 2.));
-	racket->y = MAX(racket->y, (-GL_VIEW_SIZE / 2. + racket->side / 2.));
-	racket->x = MIN(racket->x, (GL_VIEW_SIZE / 2.) * aspectRatio - (racket->side / 2.));
-	racket->y = MIN(racket->y, (GL_VIEW_SIZE / 2. - racket->side / 2.));
+	racket->x = MAX(racket->x, -0.34);
+	racket->y = MAX(racket->y, -0.84);
+	racket->x = MIN(racket->x, 0.34);
+	racket->y = MIN(racket->y, 0.84);
 }
 
 void update_racket(Racket* racket, double x, double y) {
