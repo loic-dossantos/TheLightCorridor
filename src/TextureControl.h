@@ -19,7 +19,7 @@ typedef struct
 {
     int x, y;
     int n; // Number of channels
-    unsigned char *data;
+    char filepath[];
 } textureData;
 
 textureData *prepareTexture(GLuint texture_ids[], const int size);
