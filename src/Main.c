@@ -16,9 +16,13 @@ CoordinatesQuads playHitbox;
 CoordinatesQuads quitHitbox;
 
 /* TEXTURE Declaration */
-#define nbTextures 1
+#define nbTextures 2
 GLuint texture_ids[nbTextures];
 textureData *images_datas;
+char texturesPath[nbTextures][50] = {
+    "./ressources/playButton.jpg", // 28 chars
+    "./ressources/quitButton.jpg"  // 28 chars
+};
 
 /* Game variable */
 
@@ -74,7 +78,7 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         case GLFW_KEY_A:
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
-            freeTextures(texture_ids, images_datas, nbTextures);
+            freeTextures(images_datas, nbTextures);
             glDisable(GL_TEXTURE_2D);
             break;
         default:
@@ -94,12 +98,15 @@ void drawSquare(double side)
     glVertex2f(side_length, -side_length);
     glEnd();
 }
-void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textureId, CoordinatesQuads *coord)
+void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textuID, CoordinatesQuads *coord)
 {
 
     glBegin(GL_QUADS);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture_ids[textureId]);
+    glBindTexture(GL_TEXTURE_2D, images_datas[textuID].textureID);
+    // glBindTexture(GL_TEXTURE_2D, 3);
+
+    fprintf(stdout, " %d texture getting -  %d \n", textuID, images_datas[textuID].textureID);
 
     coord->xmin = (-x_length / 2 * scale) + x_offset;
     coord->xmax = (x_length / 2 * scale) + x_offset;
@@ -149,9 +156,9 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
+    /* CONVERT TO WINDOW COORDINATES */
     x = (x * GL_VIEW_SIZE / WINDOW_WIDTH) - GL_VIEW_SIZE / 2;
     y = -(y * GL_VIEW_SIZE / WINDOW_HEIGHT - GL_VIEW_SIZE / 2);
-    CoordinatesQuads coord = playHitbox;
     switch (currentScreen)
     {
     case MENU:
@@ -214,9 +221,9 @@ int main(int argc, char const *argv[])
     // Tells how texture is packed (fixed inclined textures problem)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    images_datas = prepareTexture(texture_ids, nbTextures);
-
+    images_datas = prepareTexture(nbTextures, texturesPath);
     glEnable(GL_TEXTURE_2D);
+
     /*  ----  */
 
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -244,7 +251,9 @@ int main(int argc, char const *argv[])
         case MENU:
             glClearColor(0.0, 0.0, 0.2, 0.0);
             glClear(GL_COLOR_BUFFER_BIT);
-            drawRectangle(6., 2., 0, -2, 1, 0, &playHitbox);
+            drawRectangleButton(6., 2., 0, -2, 1, 0, &playHitbox);
+
+            drawRectangleButton(6., 2., 0, -5, 1, 1, &quitHitbox);
             break;
         case JEU:
 

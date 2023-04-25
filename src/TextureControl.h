@@ -19,11 +19,13 @@ typedef struct
 {
     int x, y;
     int n; // Number of channels
+    GLuint textureID;
     char filepath[];
+
 } textureData;
 
-textureData *prepareTexture(GLuint texture_ids[], const int size);
+textureData *prepareTexture(const int size, char texturesPath[][50]);
 
-void freeTextures(GLuint texture_ids[], textureData datas[], const int size);
+void freeTextures(textureData datas[], const int size);
 
 #endif
