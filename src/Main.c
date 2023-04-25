@@ -6,6 +6,15 @@
 #include <stdio.h>
 #endif // STBI_NO_STDIO
 
+/* INTERRACTION */
+typedef struct
+{
+    float xmin, ymin, xmax, ymax;
+} CoordinatesQuads;
+
+CoordinatesQuads playHitbox;
+CoordinatesQuads quitHitbox;
+
 /* TEXTURE Declaration */
 #define nbTextures 1
 GLuint texture_ids[nbTextures];
@@ -17,14 +26,15 @@ static int timeStep = 0;
 static int clicked = 0;
 static int interacted = 0;
 
+/* INTERFACE */
 typedef enum
 {
     MENU,
     JEU,
     FIN
-} interface;
+} Interface;
 
-interface currentScreen = MENU;
+Interface currentScreen = MENU;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -84,6 +94,34 @@ void drawSquare(double side)
     glVertex2f(side_length, -side_length);
     glEnd();
 }
+void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textureId, CoordinatesQuads *coord)
+{
+
+    glBegin(GL_QUADS);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_ids[textureId]);
+
+    coord->xmin = (-x_length / 2 * scale) + x_offset;
+    coord->xmax = (x_length / 2 * scale) + x_offset;
+    coord->ymax = (y_length / 2 * scale) + y_offset;
+    coord->ymin = (-y_length / 2 * scale) + y_offset;
+
+    glTexCoord2f(0, 0);
+    glVertex2f(coord->xmin, coord->ymax);
+
+    glTexCoord2f(1, 0);
+    glVertex2f(coord->xmax, coord->ymax);
+
+    glTexCoord2f(1, 1);
+    glVertex2f(coord->xmax, coord->ymin);
+
+    glTexCoord2f(0, 1);
+    glVertex2f(coord->xmin, coord->ymin);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glEnd();
+    return;
+}
 
 void drawRacket(GLFWwindow *window, Racket racket)
 {
@@ -108,13 +146,39 @@ void update_screen(GLFWwindow *window, Racket *racket)
 
 void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
 {
-    if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    x = (x * GL_VIEW_SIZE / WINDOW_WIDTH) - GL_VIEW_SIZE / 2;
+    y = -(y * GL_VIEW_SIZE / WINDOW_HEIGHT - GL_VIEW_SIZE / 2);
+    CoordinatesQuads coord = playHitbox;
+    switch (currentScreen)
     {
-        clicked = 1;
-    }
-    if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-    {
-        clicked = 0;
+    case MENU:
+        if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+        {
+            fprintf(stdout, " Clicked %f || %f \n", x, y);
+            fflush(stdout);
+            if (x > playHitbox.xmin && x < playHitbox.xmax && y < playHitbox.ymax && y > playHitbox.ymin)
+            {
+                fprintf(stdout, "Clicked on PLay");
+                fflush(stdout);
+                currentScreen = JEU;
+            }
+        }
+        break;
+    case JEU:
+        if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        {
+            clicked = 1;
+        }
+        if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+        {
+            clicked = 0;
+        }
+        break;
+    case FIN:
+        break;
     }
 }
 
@@ -180,27 +244,7 @@ int main(int argc, char const *argv[])
         case MENU:
             glClearColor(0.0, 0.0, 0.2, 0.0);
             glClear(GL_COLOR_BUFFER_BIT);
-
-            glBegin(GL_QUADS);
-            glEnable(GL_TEXTURE_2D);
-
-            glBindTexture(GL_TEXTURE_2D, texture_ids[0]);
-
-            glTexCoord2f(0, 0);
-            glVertex2f(-3.f, -1.f);
-
-            glTexCoord2f(1, 0);
-            glVertex2f(3.f, -1.f);
-
-            glTexCoord2f(1, 1);
-            glVertex2f(3.f, -3.f);
-
-            glTexCoord2f(0, 1);
-            glVertex2f(-3.f, -3.f);
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            glEnd();
+            drawRectangle(6., 2., 0, -2, 1, 0, &playHitbox);
             break;
         case JEU:
 
