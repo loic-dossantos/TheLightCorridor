@@ -7,8 +7,9 @@ typedef struct {
 	double x;
 	double y;
 	double z;
-	int moving_forward;
-	double speed;
+	double move_x;
+	double move_y;
+	double move_z;
 } Ball;
 
 /* Initialise the Ball. */

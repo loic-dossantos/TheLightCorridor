@@ -10,6 +10,7 @@
 typedef struct {
 	double x;
 	double y;
+	double z;
 	double side;
 	int lives;
 } Racket;

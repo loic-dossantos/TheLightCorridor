@@ -7,6 +7,7 @@
 #include "Racket.h"
 #include "Ball.h"
 #include "3Dtools.h"
+#include "Collision.h"
 
 #define NB_SEG_CIRCLE 64
 
@@ -78,19 +79,15 @@ void drawSquareLine(double side) {
 }
 
 void drawRacket(GLFWwindow* window, Racket racket) {
-    double side = racket.side / 32.;
-
-    float z = 0.129;
-
     glPushMatrix();
         glRotatef(90.,0.,1.,0.);
         glScalef(1.0,1.0,1.0);
         glColor3f(1,1,1);
         glBegin(GL_LINE_LOOP);
-            glVertex3f(racket.x-side,racket.y-side,z);
-            glVertex3f(racket.x+side,racket.y-side,z);
-            glVertex3f(racket.x+side,racket.y+side,z);
-            glVertex3f(racket.x-side,racket.y+side,z);
+            glVertex3f(racket.x-racket.side,racket.y-racket.side,racket.z);
+            glVertex3f(racket.x+racket.side,racket.y-racket.side,racket.z);
+            glVertex3f(racket.x+racket.side,racket.y+racket.side,racket.z);
+            glVertex3f(racket.x-racket.side,racket.y+racket.side,racket.z);
         glEnd();
     glPopMatrix();
 }
@@ -146,7 +143,6 @@ void update_screen(GLFWwindow* window, Racket* racket, Ball ball) {
     glfwGetCursorPos(window, &x, &y);
     x_racket = (y / WINDOW_HEIGHT) - 0.5;
     y_racket = (x / WINDOW_HEIGHT) - 1.;
-    printf("x: %f, y: %f\n", x_racket, y_racket);
 
     update_racket(racket, x_racket, y_racket);
     drawRacket(window, *racket);
@@ -194,7 +190,7 @@ int main(int argc, char const *argv[]) {
     glPointSize(5.0);
     glEnable(GL_DEPTH_TEST);
 
-    Racket racket = init_racket(5.);
+    Racket racket = init_racket(0.15);
     Ball ball = init_ball();
 
     /* Loop until the user closes the window */
@@ -230,11 +226,12 @@ int main(int argc, char const *argv[]) {
 
         /* Animate scenery */
         update_ball(&ball);
-        if(ball.x > 0. && !ball.moving_forward) {
-            ball.moving_forward = 1;
+        check_collision_racket(racket, ball);
+        if(ball.x > 0. && ball.move_x > 0) {
+            ball.move_x *= -1;
         }
-        if(ball.x < -2. && ball.moving_forward) {
-            ball.moving_forward = 0;
+        if(ball.x < -2. && ball.move_x < 0) {
+            ball.move_x *= -1;
         }
     }
 

@@ -5,6 +5,7 @@ Racket init_racket(double side) {
 
 	racket.x = 0;
 	racket.y = 0;
+	racket.z = 0.129;
 	racket.side = side;
 	racket.lives = 5;
 
