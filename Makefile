@@ -9,7 +9,7 @@ OBJDIR	= obj/
 
 # Names of executable and objects
 EXEC = LightCorridor
-OBJ = $(OBJDIR)Main.o $(OBJDIR)Racket.o $(OBJDIR)WindowConfig.o $(OBJDIR)3Dtools.o
+OBJ = $(OBJDIR)Main.o $(OBJDIR)Racket.o $(OBJDIR)Ball.o $(OBJDIR)WindowConfig.o $(OBJDIR)3Dtools.o
 
 $(BINDIR)$(EXEC): $(OBJ)
 	@mkdir -p $(BINDIR)
@@ -17,7 +17,9 @@ $(BINDIR)$(EXEC): $(OBJ)
 
 $(OBJDIR)Main.o: $(SRCDIR)Main.c $(SRCDIR)3Dtools.h $(SRCDIR)Racket.h
 
-$(OBJDIR)3Dtools.o: $(SRCDIR)3Dtools.h $(SRCDIR)3Dtools.c
+$(OBJDIR)3Dtools.o: $(SRCDIR)3Dtools.c $(SRCDIR)3Dtools.h
+
+$(OBJDIR)Ball.o: $(SRCDIR)Ball.c $(SRCDIR)Ball.h
 
 $(OBJDIR)Racket.o: $(SRCDIR)Racket.c $(SRCDIR)Racket.h $(SRCDIR)WindowConfig.h
 

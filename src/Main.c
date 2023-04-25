@@ -5,14 +5,10 @@
 #include <math.h>
 
 #include "Racket.h"
+#include "Ball.h"
 #include "3Dtools.h"
 
 #define NB_SEG_CIRCLE 64
-
-double ball_x = 0.;
-double ball_y = 0.;
-// 1 = avance, 0 = recule
-int ball_forward = 1;
 
 /* Error handling function */
 void onError(int error, const char* description) {
@@ -144,7 +140,7 @@ void drawWall(double depth) {
     glPopMatrix();
 }
 
-void update_screen(GLFWwindow* window, Racket* racket) {
+void update_screen(GLFWwindow* window, Racket* racket, Ball ball) {
     double x, y, x_racket, y_racket;
 
     glfwGetCursorPos(window, &x, &y);
@@ -156,17 +152,18 @@ void update_screen(GLFWwindow* window, Racket* racket) {
     drawRacket(window, *racket);
     drawCorridor();
 
-    /* Scene rendering */
+    /* Ball Rendering with shadow */
     glColor3f(1.0, 0.0, 0.0);
     glPushMatrix();
-        glTranslatef(ball_x,ball_y,0.0);
+        glTranslatef(ball.x,ball.y,0.0);
         glScalef(0.1,0.1,0.1);
         drawSphere();
         glColor3f(1.0, 1.0, 1.0);
         glTranslatef(0.0,0.0,-4.9);
         drawCircle();
     glPopMatrix();
-    drawWall(1.);
+    
+    //drawWall(1.);
 }
 
 int main(int argc, char const *argv[]) {
@@ -198,6 +195,7 @@ int main(int argc, char const *argv[]) {
     glEnable(GL_DEPTH_TEST);
 
     Racket racket = init_racket(5.);
+    Ball ball = init_ball();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -214,7 +212,7 @@ int main(int argc, char const *argv[]) {
         glLoadIdentity();
         setCamera();
 
-        update_screen(window, &racket);
+        update_screen(window, &racket, ball);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -231,17 +229,12 @@ int main(int argc, char const *argv[]) {
         }
 
         /* Animate scenery */
-        if(ball_forward) {
-            ball_x -= 0.05;
+        update_ball(&ball);
+        if(ball.x > 0. && !ball.moving_forward) {
+            ball.moving_forward = 1;
         }
-        else {
-            ball_x += 0.05;
-        }
-        if(ball_x > 0. && !ball_forward) {
-            ball_forward = 1;
-        }
-        if(ball_x < -2. && ball_forward) {
-            ball_forward = 0;
+        if(ball.x < -2. && ball.moving_forward) {
+            ball.moving_forward = 0;
         }
     }
 
