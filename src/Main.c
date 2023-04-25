@@ -226,10 +226,7 @@ int main(int argc, char const *argv[]) {
 
         /* Animate scenery */
         update_ball(&ball);
-        check_collision_racket(racket, ball);
-        if(ball.x > 0. && ball.move_x > 0) {
-            ball.move_x *= -1;
-        }
+        collision_racket(&racket, &ball);
         if(ball.x < -2. && ball.move_x < 0) {
             ball.move_x *= -1;
         }
