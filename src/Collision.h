@@ -3,14 +3,16 @@
 
 #include "Racket.h"
 #include "Ball.h"
+#include "Wall.h"
+#include "Corridor.h"
 
 /* Check if the Ball colide with the Racket. */
-int check_collision_racket(Racket racket, Ball ball);
+int check_collision_racket(Corridor corridor);
 
 /* Handle the collision of the the Ball with the Racket. */
-void collision_racket(Racket* racket, Ball* ball);
+void collision_racket(Corridor* corridor);
 
 /* Handle the collision of the the Ball with the Corridor. */
-void collision_corridor(Ball* ball);
+void collision_corridor(Corridor* corridor);
 
 #endif

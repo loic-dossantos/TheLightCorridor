@@ -3,11 +3,14 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "Racket.h"
 #include "Ball.h"
 #include "3Dtools.h"
 #include "Collision.h"
+#include "Corridor.h"
 #include "TextureControl.h"
 
 #define NB_SEG_CIRCLE 64
@@ -224,7 +227,7 @@ void drawRectangleButton(float x_length, float y_length, float x_offset, float y
     return;
 }
 
-void update_screen(GLFWwindow *window, Racket *racket, Ball ball)
+void update_screen(GLFWwindow *window, Corridor* corridor)
 {
     double x, y, x_racket, y_racket;
 
@@ -232,18 +235,18 @@ void update_screen(GLFWwindow *window, Racket *racket, Ball ball)
     x_racket = (y / WINDOW_HEIGHT) - 0.5;
     y_racket = (x / WINDOW_HEIGHT) - 1.;
 
-    update_racket(racket, x_racket, y_racket);
-    drawRacket(window, *racket);
+    update_racket(&(corridor->racket), x_racket, y_racket);
+    drawRacket(window, corridor->racket);
     drawCorridor();
 
     /* Ball Rendering with shadow */
     glColor3f(1.0, 0.0, 0.0);
     glPushMatrix();
-    glTranslatef(ball.x, ball.y, ball.z);
+    glTranslatef(corridor->ball.x, corridor->ball.y, corridor->ball.z);
     glScalef(0.1, 0.1, 0.1);
     drawSphere();
     glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(0.0, 0.0, -4.9 - ball.z * 10);
+    glTranslatef(0.0, 0.0, -4.9 - corridor->ball.z * 10);
     drawCircle();
     glPopMatrix();
 
@@ -293,6 +296,8 @@ int main(int argc, char const *argv[])
 {
     GLFWwindow *window;
 
+    srand(time(NULL));
+
     if (!glfwInit())
         return -1;
 
@@ -331,8 +336,7 @@ int main(int argc, char const *argv[])
     glPointSize(5.0);
     glEnable(GL_DEPTH_TEST);
 
-    Racket racket = init_racket(0.15);
-    Ball ball = init_ball();
+    Corridor corridor = create_corridor();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -360,13 +364,13 @@ int main(int argc, char const *argv[])
             break;
         case JEU:
             setCamera();
-            update_screen(window, &racket, ball);
-            update_ball(&ball);
-            collision_racket(&racket, &ball);
-            collision_corridor(&ball);
-            if (ball.x < -2. && ball.move_x < 0)
+            update_screen(window, &corridor);
+            update_ball(&(corridor.ball));
+            collision_racket(&corridor);
+            collision_corridor(&corridor);
+            if (corridor.ball.x < -2. && corridor.ball.move_x < 0)
             {
-                ball.move_x *= -1;
+                corridor.ball.move_x *= -1;
             }
             //fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
             if (!interacted) // Si la racket n'interragit pas avec la balle
