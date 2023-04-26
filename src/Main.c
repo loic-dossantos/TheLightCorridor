@@ -269,6 +269,7 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
                 fprintf(stdout, "Clicked on PLay");
                 fflush(stdout);
                 currentScreen = JEU;
+                glDisable(GL_TEXTURE_2D);
             }
         }
         break;
@@ -357,7 +358,6 @@ int main(int argc, char const *argv[])
             drawRectangleButton(6., 2., 0, -5, 1, 1, &quitHitbox);
             break;
         case JEU:
-            // setCamera();
             setCamera();
             update_screen(window, &racket, ball);
             fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
