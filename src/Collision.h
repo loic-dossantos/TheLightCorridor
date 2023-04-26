@@ -10,4 +10,7 @@ int check_collision_racket(Racket racket, Ball ball);
 /* Handle the collision of the the Ball with the Racket. */
 void collision_racket(Racket* racket, Ball* ball);
 
+/* Handle the collision of the the Ball with the Corridor. */
+void collision_corridor(Ball* ball);
+
 #endif

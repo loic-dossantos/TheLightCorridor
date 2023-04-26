@@ -192,6 +192,7 @@ void drawWall(double depth)
     drawSquare();
     glPopMatrix();
 }
+
 void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textuID, CoordinatesQuads *coord)
 {
     glBegin(GL_QUADS);
@@ -238,11 +239,11 @@ void update_screen(GLFWwindow *window, Racket *racket, Ball ball)
     /* Ball Rendering with shadow */
     glColor3f(1.0, 0.0, 0.0);
     glPushMatrix();
-    glTranslatef(ball.x, ball.y, 0.0);
+    glTranslatef(ball.x, ball.y, ball.z);
     glScalef(0.1, 0.1, 0.1);
     drawSphere();
     glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(0.0, 0.0, -4.9);
+    glTranslatef(0.0, 0.0, -4.9 - ball.z * 10);
     drawCircle();
     glPopMatrix();
 
@@ -262,12 +263,12 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
     case MENU:
         if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
         {
-            fprintf(stdout, " Clicked %f || %f \n", x, y);
-            fflush(stdout);
+            //fprintf(stdout, " Clicked %f || %f \n", x, y);
+            //fflush(stdout);
             if (x > playHitbox.xmin && x < playHitbox.xmax && y < playHitbox.ymax && y > playHitbox.ymin)
             {
-                fprintf(stdout, "Clicked on PLay");
-                fflush(stdout);
+                //fprintf(stdout, "Clicked on PLay");
+                //fflush(stdout);
                 currentScreen = JEU;
                 glDisable(GL_TEXTURE_2D);
             }
@@ -360,7 +361,14 @@ int main(int argc, char const *argv[])
         case JEU:
             setCamera();
             update_screen(window, &racket, ball);
-            fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
+            update_ball(&ball);
+            collision_racket(&racket, &ball);
+            collision_corridor(&ball);
+            if (ball.x < -2. && ball.move_x < 0)
+            {
+                ball.move_x *= -1;
+            }
+            //fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
             if (!interacted) // Si la racket n'interragit pas avec la balle
             {
                 timeStep++;
@@ -388,12 +396,7 @@ int main(int argc, char const *argv[])
         }
 
         /* Animate scenery */
-        update_ball(&ball);
-        collision_racket(&racket, &ball);
-        if (ball.x < -2. && ball.move_x < 0)
-        {
-            ball.move_x *= -1;
-        }
+        
     }
 
     glfwTerminate();
