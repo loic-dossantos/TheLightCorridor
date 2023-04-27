@@ -3,6 +3,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "Racket.h"
 #include "Ball.h"
@@ -16,6 +18,9 @@
 #include <stdio.h>
 #endif // STBI_NO_STDIO
 
+
+/* RANDOM */
+int flickerCount = 0;
 
 float incre = 0;
 /* INTERRACTION */
@@ -34,13 +39,14 @@ GLfloat quitWindowHitbox[4][3];
 GLfloat TitleHitbox[4][3];
 
 /* TEXTURE Declaration */
-#define nbTextures 3
+#define nbTextures 4
 GLuint textures[nbTextures];
 textureData *images_datas;
 char *texturesPath[nbTextures] = {
     "./ressources/playButton.jpg", // 28 chars
     "./ressources/quitButton.jpg",  // 28 chars
-    "./ressources/Title.png"  // 23 chars
+    "./ressources/Title.png",  // 23 chars
+    "./ressources/Title2.png"  // 24 chars
 };
 
 /* Game variable */
@@ -402,6 +408,8 @@ int main(int argc, char const *argv[])
 
     images_datas = prepareTexture(textures ,nbTextures, texturesPath);
 
+    /* RANDOM */
+    srand(time(NULL));
     /*  ----  */
 
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -434,10 +442,21 @@ int main(int argc, char const *argv[])
             setCamera();
 
             glPushMatrix();
-            
+
+
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-            drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, TitleHitbox);
+            // pseudo-Flickering
+            if (flickerCount == 0){
+            if ( rand() % 20 == 0){
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
+                flickerCount += (rand()%4 + 2);
+            } else {
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, TitleHitbox);
+            }}else {
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
+                flickerCount--;
+            }
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
 
