@@ -16,22 +16,31 @@
 #include <stdio.h>
 #endif // STBI_NO_STDIO
 
+
+float incre = 0;
 /* INTERRACTION */
+GLdouble modelMat[16];
+GLdouble projectionMat[16];
+GLint view[4];
 typedef struct
 {
     float xmin, ymin, xmax, ymax;
 } CoordinatesQuads;
 
-CoordinatesQuads playHitbox;
-CoordinatesQuads quitHitbox;
+GLfloat playHitbox[4][3];
+GLfloat playWindowHitbox[4][3];
+GLfloat quitHitbox[4][3];
+GLfloat quitWindowHitbox[4][3];
+GLfloat TitleHitbox[4][3];
 
 /* TEXTURE Declaration */
-#define nbTextures 2
-GLuint texture_ids[nbTextures];
+#define nbTextures 3
+GLuint textures[nbTextures];
 textureData *images_datas;
-char texturesPath[nbTextures][50] = {
+char *texturesPath[nbTextures] = {
     "./ressources/playButton.jpg", // 28 chars
-    "./ressources/quitButton.jpg"  // 28 chars
+    "./ressources/quitButton.jpg",  // 28 chars
+    "./ressources/Title.png"  // 23 chars
 };
 
 /* Game variable */
@@ -75,10 +84,9 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         {
         case GLFW_KEY_A:
         case GLFW_KEY_ESCAPE:
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-            freeTextures(images_datas, nbTextures);
+            freeTextures(textures, images_datas, nbTextures);
             glDisable(GL_TEXTURE_2D);
-            break;
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
         case GLFW_KEY_L:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -97,7 +105,7 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
             printf("Zoom is %f\n", dist_zoom);
             break;
         case GLFW_KEY_UP:
-            if (phy > 2)
+            if (phy > 0)
                 phy -= 2;
             printf("Phy %f\n", phy);
             break;
@@ -106,11 +114,23 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
                 phy += 2;
             printf("Phy %f\n", phy);
             break;
+        case GLFW_KEY_U:
+            incre += 0.5;
+            printf("incre %f\n", incre);
+            break;
+        case GLFW_KEY_I:
+            incre -= 0.5;
+            printf("incre %f\n", incre);
+            break;
         case GLFW_KEY_LEFT:
-            theta -= 5;
+            theta -= 10;
+            printf("theta %f\n", theta);
+
             break;
         case GLFW_KEY_RIGHT:
-            theta += 5;
+            theta += 10;
+            printf("theta %f\n", theta);
+
             break;
         default:
             fprintf(stdout, "Touche non gérée (%d)\n", key);
@@ -182,8 +202,7 @@ void drawCorridor()
     }
 }
 
-void drawWall(double depth)
-{
+void drawWall(double depth){
     glPushMatrix();
     glRotatef(90., 0., 1., 0.);
     glTranslatef(0.0, -7.5, -10.0 * depth);
@@ -192,36 +211,73 @@ void drawWall(double depth)
     drawSquare();
     glPopMatrix();
 }
-void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textuID, CoordinatesQuads *coord)
-{
-    glBegin(GL_QUADS);
+void drawRectangleTextured(float x_length, float y_length, float x_offset, float y_offset,float z_offset, float scale, int textuID,GLfloat hitbox[][3]){
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, images_datas[textuID].textureID);
-    // glBindTexture(GL_TEXTURE_2D, 3);
+    glBindTexture(GL_TEXTURE_2D, textures[textuID]);
+    glBegin(GL_QUADS);
 
-    // fprintf(stdout, " %d texture getting -  %d \n", textuID, images_datas[textuID].textureID);
+    float x1  = (-x_length / 2 * scale) + x_offset;
+    float x2  = (x_length / 2 * scale) + x_offset;
+    float y2  = (y_length / 2 * scale) + y_offset;
+    float y1  = (-y_length / 2 * scale) + y_offset;
 
-    coord->xmin = (-x_length / 2 * scale) + x_offset;
-    coord->xmax = (x_length / 2 * scale) + x_offset;
-    coord->ymax = (y_length / 2 * scale) + y_offset;
-    coord->ymin = (-y_length / 2 * scale) + y_offset;
+    GLfloat rect[4][3] = {
+    {x1, y2, z_offset},  // Top-left
+    {x2, y2, z_offset},  // Top-right
+    {x2, y1, z_offset},  // Bottom-right
+    {x1, y1, z_offset}   // Bottom-left
+    };
+    for (int i = 0; i<4;i++){
+        for (int j = 0; j<3;j++){
+            hitbox[i][j] = rect[i][j];
+        }
+    }
 
-    glTexCoord2f(0, 0);
-    glVertex2f(coord->xmin, coord->ymax);
+    glTexCoord3f(0, 0, 0);
+    glVertex3f(x1, y2, z_offset);
 
-    glTexCoord2f(1, 0);
-    glVertex2f(coord->xmax, coord->ymax);
+    glTexCoord3f(1, 0, 0);
+    glVertex3f(x2, y2, z_offset);
 
-    glTexCoord2f(1, 1);
-    glVertex2f(coord->xmax, coord->ymin);
+    glTexCoord3f(1, 1, 0);
+    glVertex3f(x2, y1, z_offset);
 
-    glTexCoord2f(0, 1);
-    glVertex2f(coord->xmin, coord->ymin);
+    glTexCoord3f(0, 1, 0);
+    glVertex3f(x1, y1, z_offset);
+
+    // Reset
     glBindTexture(GL_TEXTURE_2D, 0);
-
+    glDisable(GL_TEXTURE_2D);
     glEnd();
+
     return;
 }
+/*
+getProjection(GLfloat hitbox[4][3], GLfloat onWindowHitbox[4][3]){
+
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelMat);
+    glGetDoublev(GL_PROJECTION_MATRIX, projectionMat);
+    glGetIntegerv(GL_VIEWPORT, view);
+
+    
+
+    // Project each of the four corners of the rectangle onto the screen
+    for (int i = 0; i < 4; i++) {
+        gluProject(hitbox[i][0], hitbox[i][1], hitbox[i][2], modelMat, projectionMat, view,
+                &onWindowHitbox[i][0], &onWindowHitbox[i][1], &onWindowHitbox[i][2]);
+    }
+     for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {
+            // Use printf() to output each element of the array
+            printf("%f ", onWindowHitbox[i][j]);
+        }
+        printf(" || "); // Move to the next row
+    }printf("  \n"); // Move to the next row
+    for (int i = 0; i < 4; i++) {
+    printf("Object point in screen coordinates: (%f, %f)\n", onWindowHitbox[i][0], onWindowHitbox[i][1]);
+    }
+}*/
 
 void update_screen(GLFWwindow *window, Racket *racket, Ball ball)
 {
@@ -249,14 +305,28 @@ void update_screen(GLFWwindow *window, Racket *racket, Ball ball)
     // drawWall(1.);
 }
 
-void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
-{
+void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
     double x, y;
     glfwGetCursorPos(window, &x, &y);
 
     /* CONVERT TO WINDOW COORDINATES */
     x = (x * GL_VIEW_SIZE / WINDOW_WIDTH) - GL_VIEW_SIZE / 2;
     y = -(y * GL_VIEW_SIZE / WINDOW_HEIGHT - GL_VIEW_SIZE / 2);
+
+    /*glGetDoublev(GL_MODELVIEW_MATRIX, modelMat);
+    glGetDoublev(GL_PROJECTION_MATRIX, projectionMat);
+    glGetIntegerv(GL_VIEWPORT, view);
+    float nx,ny,nz; // near point
+    float fx,fy,fz; // far point
+    double winX = (double) x;
+    double winY = view[3] - (double) y;
+
+
+    gluUnProject(winX, winY, 0.0, modelMat, projectionMat, view,&nx,&ny,&nz);
+    gluUnProject(winX, winY, 0.0, modelMat, projectionMat, view,&fx,&fy,&fz);
+    fprintf(stdout, " Clicked unprojected near %f  %f || far %f %f \n", nx, ny,fx,fy);
+    fflush(stdout); */
+    
     switch (currentScreen)
     {
     case MENU:
@@ -264,12 +334,21 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
         {
             fprintf(stdout, " Clicked %f || %f \n", x, y);
             fflush(stdout);
-            if (x > playHitbox.xmin && x < playHitbox.xmax && y < playHitbox.ymax && y > playHitbox.ymin)
-            {
-                fprintf(stdout, "Clicked on PLay");
+            if (x > -1.7 && x < 1.7 && y < -1.2 && y > -3.5){
+                fprintf(stdout, "Clicked on Play\n");
                 fflush(stdout);
                 currentScreen = JEU;
+                theta = 0.0f; // Angle between x axis and viewpoint
+                phy = 90.0f; // Angle between z axis and viewpoint
+                dist_zoom = 1.0f; // Distance between origin and viewpoint
                 glDisable(GL_TEXTURE_2D);
+            }
+            if (x > -1.7 && x < 1.7 && y < -4.7 && y > -7.0){
+                fprintf(stdout, "Clicked on Quit\n");
+                fflush(stdout);
+                freeTextures(textures, images_datas, nbTextures);
+                glDisable(GL_TEXTURE_2D);
+                glfwSetWindowShouldClose(window, GLFW_TRUE);
             }
         }
         break;
@@ -318,10 +397,10 @@ int main(int argc, char const *argv[])
 
     /* Texture */
     // Tells how texture is packed (fixed inclined textures problem)
+
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    images_datas = prepareTexture(nbTextures, texturesPath);
-    glEnable(GL_TEXTURE_2D);
+    images_datas = prepareTexture(textures ,nbTextures, texturesPath);
 
     /*  ----  */
 
@@ -334,8 +413,7 @@ int main(int argc, char const *argv[])
     Ball ball = init_ball();
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)){
         /* Get time (in second) at loop beginning */
         double startTime = glfwGetTime();
 
@@ -353,9 +431,20 @@ int main(int argc, char const *argv[])
         case MENU:
             glClearColor(0.0, 0.0, 0.2, 0.0);
             glClear(GL_COLOR_BUFFER_BIT);
-            drawRectangleButton(6., 2., 0, -2, 1, 0, &playHitbox);
+            setCamera();
 
-            drawRectangleButton(6., 2., 0, -5, 1, 1, &quitHitbox);
+            glPushMatrix();
+            
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+            drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, TitleHitbox);
+            glDisable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ZERO);
+
+            drawRectangleTextured(6., 2., 0, -2,-14., 1, 0, playHitbox);
+            drawRectangleTextured(6., 2., 0, -5, -14, 1, 1, quitHitbox);
+
+            glPopMatrix();
             break;
         case JEU:
             setCamera();
