@@ -5,13 +5,22 @@ Corridor init_corridor() {
 
 	corridor.racket = init_racket(0.15);
     corridor.ball = init_ball();
-    corridor.walls = (Wall*) malloc(200 * sizeof(Wall));
+    corridor.pause = 0;
 
     return corridor;
 }
 
-void free_corridor(Corridor* corridor) {
-	free(corridor->walls);
+void unpause(Corridor* corridor) {
+	if(corridor->racket.lives <= 0) {
+		printf("GAME OVER\n");
+	}
+	if(corridor->pause) {
+		corridor->pause = 0;
+		corridor->ball = init_ball();
+		corridor->ball.x = corridor->racket.z -0.179;
+		corridor->ball.y = corridor->racket.y;
+		corridor->ball.z = -corridor->racket.x;
+	}
 }
 
 void add_level(Corridor* corridor, int level) {

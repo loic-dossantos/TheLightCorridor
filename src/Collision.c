@@ -19,6 +19,8 @@ void collision_racket(Corridor* corridor) {
             corridor->ball.move_x = 0;
             corridor->ball.move_y = 0;
             corridor->ball.move_z = 0;
+            corridor->pause = 1;
+            corridor->racket.lives--;
         }
     }
 }

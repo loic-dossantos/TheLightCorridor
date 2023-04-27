@@ -53,6 +53,8 @@ typedef enum
 
 Interface currentScreen = MENU;
 
+int right_clicked = 0;
+
 /* Error handling function */
 void onError(int error, const char *description)
 {
@@ -286,6 +288,10 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods)
         {
             clicked = 0;
         }
+        if (key == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        {
+            right_clicked = 1;
+        }
         break;
     case FIN:
         break;
@@ -368,6 +374,10 @@ int main(int argc, char const *argv[])
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
+            if(corridor.pause && right_clicked) {
+                right_clicked = 0;
+                unpause(&corridor);
+            }
             if (corridor.ball.x < -2. && corridor.ball.move_x < 0)
             {
                 corridor.ball.move_x *= -1;
@@ -379,6 +389,10 @@ int main(int argc, char const *argv[])
             }
             else
             {
+            }
+            // Reset richtclicked.
+            if(right_clicked) {
+                right_clicked = 0;
             }
             break;
         case FIN:
@@ -398,9 +412,6 @@ int main(int argc, char const *argv[])
         {
             glfwWaitEventsTimeout(FRAMERATE_IN_SECONDS - elapsedTime);
         }
-
-        /* Animate scenery */
-        
     }
 
     glfwTerminate();

@@ -11,14 +11,15 @@
 typedef struct {
 	Racket racket;
 	Ball ball;
-	Wall* walls;
+	Wall walls[50];
+	int pause;
 } Corridor;
 
 /* Initialise the Corridor. */
 Corridor init_corridor();
 
-/* Free the Walls of the Corridor. */
-void free_corridor(Corridor* corridor);
+/* Set pause to 0 and reset the Ball in front of the Racket. */
+void unpause(Corridor* corridor);
 
 /* Add the Walls of one level. */
 void add_level(Corridor* corridor, int level);
