@@ -187,15 +187,18 @@ void drawCorridor()
     }
 }
 
-void drawWall(double depth)
+void drawWalls(Corridor corridor)
 {
-    glPushMatrix();
-    glRotatef(90., 0., 1., 0.);
-    glTranslatef(0.0, -7.5, -10.0 * depth);
-    glScalef(10.0, 10.0, 1.0);
-    glColor3f(0, 0, 0.7);
-    drawSquare();
-    glPopMatrix();
+    for(int i = 0; i < corridor.number_of_walls; i++) {
+        Wall wall = corridor.walls[i];
+        glPushMatrix();
+            glRotatef(90., 0., 1., 0.);
+            glTranslatef(wall.z, wall.y, wall.x);
+            glScalef(wall.x_scale, wall.y_scale, 1.0);
+            glColor3f(0, 0, 0.7);
+            drawSquare();
+        glPopMatrix();
+    }
 }
 
 void drawRectangleButton(float x_length, float y_length, float x_offset, float y_offset, float scale, int textuID, CoordinatesQuads *coord)
@@ -371,17 +374,21 @@ int main(int argc, char const *argv[])
         case JEU:
             setCamera();
             update_screen(window, &corridor);
+
+            drawWalls(corridor);
+
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
             if(corridor.pause && right_clicked) {
-                right_clicked = 0;
                 unpause(&corridor);
             }
-            if (corridor.ball.x < -2. && corridor.ball.move_x < 0)
-            {
-                corridor.ball.move_x *= -1;
+            if(clicked && !corridor.pause) {
+                collision_racket_wall(&corridor);
             }
+
+            collision_walls(&corridor);
+
             //fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
             if (!interacted) // Si la racket n'interragit pas avec la balle
             {

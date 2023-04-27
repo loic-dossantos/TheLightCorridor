@@ -15,4 +15,7 @@ void collision_racket(Corridor* corridor);
 /* Handle the collision of the the Ball with the Corridor. */
 void collision_corridor(Corridor* corridor);
 
+/* Handle the collision of the the Ball with the Walls. */
+void collision_walls(Corridor* corridor);
+
 #endif
