@@ -4,7 +4,7 @@
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 1200;
 static const unsigned int WINDOW_HEIGHT = 600;
-static const char WINDOW_TITLE[] = "TD03 Ex01";
+static const char WINDOW_TITLE[] = "The Light Corridor";
 static float aspectRatio = WINDOW_WIDTH / (float) WINDOW_HEIGHT;
 
 /* Minimal time wanted between two images */
