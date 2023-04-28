@@ -40,14 +40,16 @@ GLfloat quitWindowHitbox[4][3];
 GLfloat TitleHitbox[4][3];
 
 /* TEXTURE Declaration */
-#define nbTextures 4
+#define nbTextures 6
 GLuint textures[nbTextures];
 textureData *images_datas;
 char *texturesPath[nbTextures] = {
     "./ressources/playButton.jpg", // 28 chars
     "./ressources/quitButton.jpg",  // 28 chars
     "./ressources/Title.png",  // 23 chars
-    "./ressources/Title2.png"  // 24 chars
+    "./ressources/Title2.png",  // 24 chars
+    "./ressources/heartFull.png",
+    "./ressources/heartEmpty.png"
 };
 
 /* Game variable */
@@ -103,12 +105,12 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         case GLFW_KEY_P:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             break;
-        case GLFW_KEY_KP_9:
+        case GLFW_KEY_J:
             if (dist_zoom < 100.0f)
                 dist_zoom *= 1.1;
             printf("Zoom is %f\n", dist_zoom);
             break;
-        case GLFW_KEY_KP_3:
+        case GLFW_KEY_H:
             if (dist_zoom > 1.0f)
                 dist_zoom *= 0.9;
             printf("Zoom is %f\n", dist_zoom);
@@ -180,7 +182,7 @@ void drawCorridor(Corridor corridor)
     float z2 = -1.;
     for (int i = 0; i < 2000; i++)
     {
-        glColor3f((1. / 2000.) * i, (1. / 20.) * i, (1. / 20.) * i);
+        glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
 
         double x = -0.5*i + corridor.depth;
 
@@ -223,6 +225,8 @@ void drawWalls(Corridor corridor)
             glScalef(wall.x_scale, wall.y_scale, 1.0);
             glColor3f(0, 0, 0.7);
             drawSquare();
+            glColor3f(1, 1, 1);
+            
         glPopMatrix();
     }
 }
@@ -263,9 +267,9 @@ void drawRectangleTextured(float x_length, float y_length, float x_offset, float
     glVertex3f(x1, y1, z_offset);
 
     // Reset
+    glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
-    glEnd();
 
     return;
 }
@@ -473,6 +477,8 @@ int main(int argc, char const *argv[])
                 drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
                 flickerCount--;
             }
+            //drawRectangleTextured(1, 1., 0, 0,0., 1, 4, playHitbox);
+
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
 
@@ -482,6 +488,8 @@ int main(int argc, char const *argv[])
             glPopMatrix();
             break;
         case JEU:
+            glClear(GL_COLOR_BUFFER_BIT);
+
             setCamera();
             update_screen(window, &corridor);
 
@@ -511,6 +519,26 @@ int main(int argc, char const *argv[])
             if(right_clicked) {
                 right_clicked = 0;
             }
+
+            glPushMatrix();
+            glRotatef(90., 0., 1., 0.);
+            glRotatef(90., 0., 0., 1.);
+            glTranslatef(-0.9, 0.45,0);
+            glScalef(0.2,0.2,0.2);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+            //(float x_length, float y_length, float x_offset, float y_offset,float z_offset, float scale, int textuID,GLfloat hitbox[][3]){
+            for (int i = 0; i< 10;i++){
+                if (i < corridor.racket.lives  ){
+                drawRectangleTextured(1, 1., 0+i, 0, 0. , 0.4, 4, playHitbox);
+                }else {
+                    drawRectangleTextured(1, 1., 0+i, 0, 0. , 0.4, 5, playHitbox);
+                }
+            }
+            glDisable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ZERO);
+
+            glPopMatrix();
             break;
         case FIN:
             break;
