@@ -465,7 +465,7 @@ int main(int argc, char const *argv[])
 
 
             glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             // pseudo-Flickering
             if (flickerCount == 0){
             if ( rand() % 20 == 0){
@@ -477,7 +477,6 @@ int main(int argc, char const *argv[])
                 drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
                 flickerCount--;
             }
-            //drawRectangleTextured(1, 1., 0, 0,0., 1, 4, playHitbox);
 
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
@@ -523,16 +522,16 @@ int main(int argc, char const *argv[])
             glPushMatrix();
             glRotatef(90., 0., 1., 0.);
             glRotatef(90., 0., 0., 1.);
-            glTranslatef(-0.9, 0.45,0);
+            glTranslatef(-0.9, 0.43,0);
             glScalef(0.2,0.2,0.2);
+
             glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-            //(float x_length, float y_length, float x_offset, float y_offset,float z_offset, float scale, int textuID,GLfloat hitbox[][3]){
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             for (int i = 0; i< 10;i++){
                 if (i < corridor.racket.lives  ){
-                drawRectangleTextured(1, 1., 0+i, 0, 0. , 0.4, 4, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0,0.999 , 0.25, 4, playHitbox);
                 }else {
-                    drawRectangleTextured(1, 1., 0+i, 0, 0. , 0.4, 5, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 5, playHitbox);
                 }
             }
             glDisable(GL_BLEND);
