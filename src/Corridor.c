@@ -7,6 +7,7 @@ Corridor init_corridor() {
     corridor.ball = init_ball();
     corridor.number_of_walls = 0;
     corridor.pause = 0;
+    corridor.depth = 0.;
 
     return corridor;
 }

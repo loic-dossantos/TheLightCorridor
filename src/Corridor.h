@@ -14,6 +14,7 @@ typedef struct {
 	Wall walls[50];
 	int number_of_walls;
 	int pause;
+	double depth;
 } Corridor;
 
 /* Initialise the Corridor. */

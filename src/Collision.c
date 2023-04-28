@@ -47,24 +47,24 @@ void collision_walls(Corridor* corridor) {
     }
 }
 
-void collision_racket_wall(Corridor *corridor) {
+int check_collision_racket_wall(Corridor *corridor) {
     for(int i = 0; i < corridor->number_of_walls; i++) {
         Wall wall = corridor->walls[i];
         if(wall.y-(wall.side/2.)*wall.y_scale < 0.085 + corridor->racket.y && wall.y+(wall.side/2.)*wall.y_scale > -0.085 + corridor->racket.y 
-            && wall.z-(wall.side/2)*wall.x_scale < 0.085 - corridor->racket.x && wall.z+(wall.side/2.)*wall.x_scale > -0.085 - corridor->racket.x
+            && -wall.z-(wall.side/2)*wall.x_scale < 0.085 - corridor->racket.x && -wall.z+(wall.side/2.)*wall.x_scale > -0.085 - corridor->racket.x
             && (wall.x - corridor->racket.z) * (wall.x - corridor->racket.z) < 0.02) {
+            return 1;
         }
-        else {
-            move_racket(&(corridor->racket));
-            dist_zoom += corridor->racket.move;
-            if(dist_zoom < 0) {
-                printf("test\n");
-                //phy = 90.0f;
-                corridor->racket.move = 0.01;
-            }
-            if(dist_zoom <= 0) {
-                phy = 270.0f;
-            }
+    }
+    return 0;
+}
+
+void collision_racket_wall(Corridor *corridor) {
+    if(!check_collision_racket_wall(corridor)) {
+        corridor->depth += 0.05;
+        for(int i = 0; i < corridor->number_of_walls;i++) {
+            corridor->walls[i].x += 0.05;
         }
+        corridor->ball.x += 0.05;
     }
 }

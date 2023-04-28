@@ -150,7 +150,7 @@ void drawRacket(GLFWwindow *window, Racket racket)
     glPopMatrix();
 }
 
-void drawCorridor()
+void drawCorridor(Corridor corridor)
 {
     float z = -0.5;
     float z2 = -1.;
@@ -158,29 +158,31 @@ void drawCorridor()
     {
         glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
 
+        double x = -0.5*i + corridor.depth;
+
         glPushMatrix();
-        glTranslatef(-0.5 * i, 0.0, z);
+        glTranslatef(x, 0.0, z);
         glScalef(0.5, 1., 0.5);
         drawRectangle();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(90., 1.0, 0., 0.);
-        glTranslatef(-0.5 * i, 0.0, z2);
+        glTranslatef(x, 0.0, z2);
         glScalef(0.5, 1., 0.5);
         drawSquare();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(-90., 1.0, 0., 0.);
-        glTranslatef(-0.5 * i, 0.0, z2);
+        glTranslatef(x, 0.0, z2);
         glScalef(0.5, 1., 0.5);
         drawSquare();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(180., 1.0, 0., 0.);
-        glTranslatef(-0.5 * i, 0.0, z);
+        glTranslatef(x, 0.0, z);
         glScalef(0.5, 1., 0.5);
         drawRectangle();
         glPopMatrix();
@@ -242,7 +244,7 @@ void update_screen(GLFWwindow *window, Corridor* corridor)
 
     update_racket(&(corridor->racket), x_racket, y_racket);
     drawRacket(window, corridor->racket);
-    drawCorridor();
+    drawCorridor(*corridor);
 
     /* Ball Rendering with shadow */
     glColor3f(1.0, 0.0, 0.0);

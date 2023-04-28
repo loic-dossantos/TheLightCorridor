@@ -13,7 +13,6 @@ typedef struct {
 	double z;
 	double side;
 	int lives;
-	double move;
 } Racket;
 
 /* Initialise the Racket. */
@@ -31,8 +30,5 @@ void lose_life(Racket *racket);
 /* Return 0 if the racket still has lives,
  * Return 1 otherwise. */
 int is_over(Racket racket);
-
-/* Move the Racket on axe Z. */
-void move_racket(Racket* racket);
 
 #endif

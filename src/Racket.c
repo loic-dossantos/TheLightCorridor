@@ -8,7 +8,6 @@ Racket init_racket(double side) {
 	racket.z = 0.129;
 	racket.side = side;
 	racket.lives = 5;
-	racket.move = -0.01;
 
 	return racket;
 }
@@ -32,8 +31,4 @@ void lose_life(Racket *racket) {
 
 int is_over(Racket racket) {
 	return !(racket.lives);
-}
-
-void move_racket(Racket* racket) {
-	racket->z += racket->move;
 }
