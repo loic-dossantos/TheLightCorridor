@@ -24,8 +24,8 @@ typedef struct
 
 } textureData;
 
-textureData *prepareTexture(const int size, char texturesPath[][50]);
+textureData *prepareTexture(GLuint textures[], const int size, char **texturesPath);
 
-void freeTextures(textureData datas[], const int size);
+void freeTextures(GLuint texures [] ,textureData datas[], const int size);
 
 #endif
