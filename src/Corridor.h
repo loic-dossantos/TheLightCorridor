@@ -11,7 +11,7 @@
 typedef struct {
 	Racket racket;
 	Ball ball;
-	Wall walls[50];
+	Wall walls[200];
 	int number_of_walls;
 	int pause;
 	double depth;

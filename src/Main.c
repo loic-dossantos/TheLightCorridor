@@ -182,7 +182,7 @@ void drawCorridor(Corridor corridor)
     float z2 = -1.;
     for (int i = 0; i < 2000; i++)
     {
-        glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
+        glColor3f((1. / 50.) * i, (1. / 50.) * i, (1. / 50.) * i);
 
         double x = -0.5*i + corridor.depth;
 
@@ -215,8 +215,7 @@ void drawCorridor(Corridor corridor)
     }
 }
 
-void drawWalls(Corridor corridor)
-{
+void drawWalls(Corridor corridor) {
     for(int i = 0; i < corridor.number_of_walls; i++) {
         Wall wall = corridor.walls[i];
         glPushMatrix();
@@ -226,7 +225,6 @@ void drawWalls(Corridor corridor)
             glColor3f(0, 0, 0.7);
             drawSquare();
             glColor3f(1, 1, 1);
-            
         glPopMatrix();
     }
 }

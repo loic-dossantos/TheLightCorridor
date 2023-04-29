@@ -17,8 +17,8 @@ typedef struct {
 /* Initialise the Wall. */
 Wall init_wall(double x, double y, double z, double side, double x_scale, double y_scale);
 
-/* Initialise a random Wall with difficulty scaling with level. */
-Wall random_wall_scale_level(int level);
+/* Initialise a random Wall. */
+Wall random_wall(double depth);
 
 Wall half_left_wall(double depth);
 
@@ -27,5 +27,13 @@ Wall half_right_wall(double depth);
 Wall half_top_wall(double depth);
 
 Wall half_bottom_wall(double depth);
+
+Wall quarter_left_wall(double depth);
+
+Wall quarter_right_wall(double depth);
+
+Wall third_middle_wall_horizontal(double depth);
+
+Wall third_middle_wall_vertical(double depth);
 
 #endif
