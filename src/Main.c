@@ -181,39 +181,44 @@ void drawCorridor(Corridor corridor)
 {
     float z = -0.5;
     float z2 = -1.;
+        glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
     for (int i = 0; i < 2000; i++)
     {
-        glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
-
+        //glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
+        glColor3f(1,1,1);
         double x = -0.5*i + corridor.depth;
 
         glPushMatrix();
         glTranslatef(x, 0.0, z);
         glScalef(0.5, 1., 0.5);
-        drawRectangle();
+        drawRectangleTx();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(90., 1.0, 0., 0.);
         glTranslatef(x, 0.0, z2);
         glScalef(0.5, 1., 0.5);
-        drawSquare();
+        drawSquareTx();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(-90., 1.0, 0., 0.);
         glTranslatef(x, 0.0, z2);
         glScalef(0.5, 1., 0.5);
-        drawSquare();
+        drawSquareTx();
         glPopMatrix();
 
         glPushMatrix();
         glRotatef(180., 1.0, 0., 0.);
         glTranslatef(x, 0.0, z);
         glScalef(0.5, 1., 0.5);
-        drawRectangle();
+        drawRectangleTx();
         glPopMatrix();
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+
 }
 
 void drawWalls(Corridor corridor)
@@ -227,6 +232,7 @@ void drawWalls(Corridor corridor)
             glColor3f(0, 0, 0.7);
             drawSquare();
             glColor3f(1, 1, 1);
+
             
         glPopMatrix();
     }
@@ -408,6 +414,26 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
         break;
     }
 }
+void glDrawLight(float length) {
+	float hl = length/2.;
+	glColor3f(1.,1.,0.);
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0.,hl,0.);
+		glVertex3f(hl,0.,0.);
+		glVertex3f(0.,0.,hl);
+		glVertex3f(-hl,0.,0.);
+		glVertex3f(0.,0.,-hl);
+		glVertex3f(hl,0.,0.);
+	glEnd();
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0.,-hl,0.);
+		glVertex3f(hl,0.,0.);
+		glVertex3f(0.,0.,hl);
+		glVertex3f(-hl,0.,0.);
+		glVertex3f(0.,0.,-hl);
+		glVertex3f(hl,0.,0.);
+	glEnd();
+}
 
 int main(int argc, char const *argv[])
 {
@@ -508,8 +534,37 @@ int main(int argc, char const *argv[])
             setCamera();
             update_screen(window, &corridor);
 
+/*
+            	//float theta_light = -M_PI/4.0+global_light*M_PI/50.0;
+	float position[4] = {0, 0, 0, 1};//{10.0f*cosf(theta_light)/sqrtf(2.f),5.0,10.0f*sinf(-theta_light)/sqrtf(2.f),1.0};
+	//float position[4] = {10.0f,0.0,0.0f,1.0};
+	glPushMatrix();
+		glTranslatef(position[0],position[1],position[2]);
+		glDrawLight(0.2);
+	glPopMatrix();
+
+
+GLfloat view[16]; 
+	glGetFloatv(GL_MODELVIEW_MATRIX, view); 
+
+	float overall_intensity = 75.0;
+	float black[4] = {0.0,0.0,0.0,1.0};
+	float spec_intensity[4] = {overall_intensity,0.0,0.0,0.0};
+	float intensite[4] = {overall_intensity,overall_intensity,overall_intensity,0.0};
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
+	glLightfv(GL_LIGHT0,GL_POSITION,position);
+	glLightfv(GL_LIGHT0,GL_AMBIENT,black);
+	glLightfv(GL_LIGHT0,GL_DIFFUSE,intensite);
+	glLightfv(GL_LIGHT0,GL_SPECULAR,spec_intensity);
+	glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
+	glLightf(GL_LIGHT0,GL_LINEAR_ATTENUATION,0.0);
+	glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,M_PI);
+*/
             drawWalls(corridor);
 
+	//glDisable(GL_LIGHTING);
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
@@ -556,6 +611,7 @@ int main(int argc, char const *argv[])
             glPopMatrix();
             if ( corridor.racket.lives <=0 ){
                 currentScreen = FIN;
+                glDisable(GL_LIGHTING);
                 }
             break;
         case FIN:

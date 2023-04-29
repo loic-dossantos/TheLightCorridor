@@ -27,13 +27,36 @@ void drawSquare() {
 		glVertex3f(-0.5,0.5,0.0);
 	glEnd();
 }
-
+void drawSquareTx() {
+	glBegin(GL_TRIANGLE_FAN);
+	    glTexCoord3f(0, 0, 0);
+		glVertex3f(-0.5,-0.5,0.0);
+		glTexCoord3f(1, 0, 0);
+		glVertex3f(0.5,-0.5,0.0);
+		glTexCoord3f(1, 1, 0);
+		glVertex3f(0.5,0.5,0.0);
+		glTexCoord3f(1, 1, 0);
+		glVertex3f(-0.5,0.5,0.0);
+	glEnd();
+}
 void drawRectangle() {
 	glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(-0.5,-1.0,0.0);
-		glVertex3f(0.5,-1.0,0.0);
-		glVertex3f(0.5,1.0,0.0);
-		glVertex3f(-0.5,1.0,0.0);
+	glVertex3f(-0.5,-1.0,0.0);
+	glVertex3f(0.5,-1.0,0.0);
+	glVertex3f(0.5,1.0,0.0);
+	glVertex3f(-0.5,1.0,0.0);
+	glEnd();
+}
+void drawRectangleTx() {
+	glBegin(GL_TRIANGLE_FAN);
+    glTexCoord3f(0, 0, 0);
+	glVertex3f(-0.5,-1.0,0.0);
+	glTexCoord3f(1, 0, 0);
+	glVertex3f(0.5,-1.0,0.0);
+    glTexCoord3f(1, 1, 0);
+	glVertex3f(0.5,1.0,0.0);
+    glTexCoord3f(1, 1, 0);
+	glVertex3f(-0.5,1.0,0.0);
 	glEnd();
 }
 
