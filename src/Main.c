@@ -33,6 +33,7 @@ typedef struct
     float xmin, ymin, xmax, ymax;
 } CoordinatesQuads;
 
+GLfloat dummyHitbox[4][3];
 GLfloat playHitbox[4][3];
 GLfloat playWindowHitbox[4][3];
 GLfloat quitHitbox[4][3];
@@ -40,7 +41,7 @@ GLfloat quitWindowHitbox[4][3];
 GLfloat TitleHitbox[4][3];
 
 /* TEXTURE Declaration */
-#define nbTextures 6
+#define nbTextures 7
 GLuint textures[nbTextures];
 textureData *images_datas;
 char *texturesPath[nbTextures] = {
@@ -49,7 +50,8 @@ char *texturesPath[nbTextures] = {
     "./ressources/Title.png",  // 23 chars
     "./ressources/Title2.png",  // 24 chars
     "./ressources/heartFull.png",
-    "./ressources/heartEmpty.png"
+    "./ressources/heartEmpty.png",
+    "./ressources/GameOver.png"
 };
 
 /* Game variable */
@@ -59,8 +61,7 @@ static int clicked = 0;
 static int interacted = 0;
 
 /* INTERFACE */
-typedef enum
-{
+typedef enum{
     MENU,
     JEU,
     FIN
@@ -273,6 +274,22 @@ void drawRectangleTextured(float x_length, float y_length, float x_offset, float
 
     return;
 }
+float easeOutExpo(float x){
+    return x == 1 ? 1 : 1-  pow(2,-10*x);
+}
+
+void drawEndTitle(){
+    static float x = 0;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // pos y  = 2 -> -1
+    glColor4f(1.0,1.0,1.0,x);
+    drawRectangleTextured(9., 3., 0, 2- (easeOutExpo(x)*3), -14, 2, 6, dummyHitbox);
+    x += 0.005;
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ZERO);
+}
 /*
 getProjection(GLfloat hitbox[4][3], GLfloat onWindowHitbox[4][3]){
 
@@ -434,7 +451,6 @@ int main(int argc, char const *argv[])
     /*  ----  */
 
     onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-
     glPointSize(5.0);
     glEnable(GL_DEPTH_TEST);
 
@@ -469,12 +485,12 @@ int main(int argc, char const *argv[])
             // pseudo-Flickering
             if (flickerCount == 0){
             if ( rand() % 20 == 0){
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, dummyHitbox);
                 flickerCount += (rand()%4 + 2);
             } else {
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, TitleHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, dummyHitbox);
             }}else {
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, TitleHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, dummyHitbox);
                 flickerCount--;
             }
 
@@ -538,8 +554,15 @@ int main(int argc, char const *argv[])
             glBlendFunc(GL_ONE, GL_ZERO);
 
             glPopMatrix();
+            if ( corridor.racket.lives <=0 ){
+                currentScreen = FIN;
+                }
             break;
         case FIN:
+            glClearColor(0.0, 0.0, 0.2, 0.0);
+            glClear(GL_COLOR_BUFFER_BIT);
+            drawEndTitle();
+
             break;
         }
 
