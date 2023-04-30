@@ -559,14 +559,17 @@ int main(int argc, char const *argv[])
             glLightf(GL_LIGHT0,GL_LINEAR_ATTENUATION,0.0);
             glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,0.2);
 
-            glEnable(GL_LIGHT0); // Light on ball
+            //glEnable(GL_LIGHT0); // Light on ball
 
 
             /*  CAMERA LIGHT SOURCE*/
             glGetDoublev(GL_MODELVIEW_MATRIX, modelMat);
-            GLfloat cam_pos[] = { -modelMat[13], -modelMat[14], -modelMat[15]}; 
-            GLfloat light_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
-            GLfloat light_diffuse[] = {overall_intensity,overall_intensity,overall_intensity,0.5};
+            //GLfloat cam_pos[] = { -modelMat[13], -modelMat[14], -modelMat[15]}; 
+            GLfloat cam_pos[] = { 0, 0, 0}; 
+            overall_intensity = 50;
+            //printf(" cam pos %f %f %f  ||", cam_pos[0] ,cam_pos[1], cam_pos[2]);
+            GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+            GLfloat light_diffuse[] = {overall_intensity,overall_intensity,overall_intensity,1};
             GLfloat light_specular[] = { 50, overall_intensity, overall_intensity, 1 };
 
             glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
@@ -574,8 +577,8 @@ int main(int argc, char const *argv[])
             glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
             glLightfv(GL_LIGHT1, GL_POSITION, cam_pos);
             glLightf(GL_LIGHT1,GL_CONSTANT_ATTENUATION,0);
-            glLightf(GL_LIGHT1,GL_LINEAR_ATTENUATION,0.0);
-            glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.2);     
+            glLightf(GL_LIGHT1,GL_LINEAR_ATTENUATION,0);
+            glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.1);     
 
 
             drawWalls(corridor);
@@ -621,9 +624,9 @@ int main(int argc, char const *argv[])
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             for (int i = 0; i< 10;i++){
                 if (i < corridor.racket.lives  ){
-                drawRectangleTextured(1, 1., 0+i, 0,0.999 , 0.25, 3, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0,0.999 , 0.25, 14, playHitbox);
                 }else {
-                drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 4, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 15, playHitbox);
                 }
             }
             glDisable(GL_BLEND);
