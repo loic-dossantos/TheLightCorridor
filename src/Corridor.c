@@ -38,16 +38,16 @@ void level_one(Corridor* corridor, int level) {
 	corridor->number_of_walls = 9;
 }
 
-Corridor create_corridor() {
+Corridor create_corridor(int nb) {
 	Corridor corridor;
 
 	corridor = init_corridor();
 	level_one(&corridor, 1);
 
-	for(int i = 9; i < 200; i++) {
+	for(int i = 9; i < nb; i++) {
 		corridor.walls[i] = random_wall(-14. - 2. * ((float)i-9.));
 	}
-	corridor.number_of_walls = 200;
+	corridor.number_of_walls = nb;
 
 	return corridor;
 }

@@ -27,6 +27,6 @@ void unpause(Corridor* corridor);
 void level_one(Corridor* corridor, int level);
 
 /* Create a corridor with the first level. */
-Corridor create_corridor();
+Corridor create_corridor(int nb);
 
 #endif
