@@ -482,7 +482,7 @@ int main(int argc, char const *argv[])
     glPointSize(5.0);
     glEnable(GL_DEPTH_TEST);
 
-    int nbObstacle = 2;
+    int nbObstacle = 10; // doit être plus que 9
 
     Corridor corridor = create_corridor(nbObstacle);
 
@@ -633,7 +633,7 @@ int main(int argc, char const *argv[])
             glPopMatrix();
 
             printf("corridor rack %f \n", corridor.depth);
-            if ( corridor.racket.lives <=0 || corridor.depth >= nbObstacle*2 +2){
+            if ( corridor.racket.lives <=0 || corridor.depth >= nbObstacle*2 -2){
                 currentScreen = FIN;
                 glDisable(GL_LIGHTING);
                 }
