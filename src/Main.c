@@ -41,24 +41,38 @@ GLfloat quitWindowHitbox[4][3];
 GLfloat TitleHitbox[4][3];
 
 /* TEXTURE Declaration */
-#define nbTextures 7
+#define nbTextures 19
 GLuint textures[nbTextures];
 textureData *images_datas;
-char *texturesPath[nbTextures] = {
+char *texturesPath[nbTextures] = {      
+    "./ressources/0.png",
+    "./ressources/1.png",
+    "./ressources/2.png",
+    "./ressources/3.png",
+    "./ressources/4.png",
+    "./ressources/5.png",
+    "./ressources/6.png",
+    "./ressources/7.png",
+    "./ressources/8.png",
+    "./ressources/9.png",
+
     "./ressources/playButton.jpg", // 28 chars
     "./ressources/quitButton.jpg",  // 28 chars
     "./ressources/Title.png",  // 23 chars
     "./ressources/Title2.png",  // 24 chars
     "./ressources/heartFull.png",
     "./ressources/heartEmpty.png",
-    "./ressources/GameOver.png"
+    "./ressources/GameOver.png",
+    "./ressources/WIN.png",
+    "./ressources/score.png"
+
 };
 
 /* Game variable */
 
 static int timeStep = 0;
 static int clicked = 0;
-static int interacted = 0;
+static int interacted = 0;    
 
 /* INTERFACE */
 typedef enum{
@@ -106,14 +120,23 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
         case GLFW_KEY_P:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             break;
+        case GLFW_KEY_ENTER:
+        if (currentScreen == MENU){
+                currentScreen = JEU;
+                theta = 0.0f; // Angle between x axis and viewpoint
+                phy = 90.0f; // Angle between z axis and viewpoint
+                dist_zoom = 1.0f; // Distance between origin and viewpoint
+
+        }
+            break;
         case GLFW_KEY_J:
             if (dist_zoom < 100.0f)
-                dist_zoom *= 1.1;
+                dist_zoom += 0.2;
             printf("Zoom is %f\n", dist_zoom);
             break;
         case GLFW_KEY_H:
-            if (dist_zoom > 1.0f)
-                dist_zoom *= 0.9;
+            //if (dist_zoom > 1.0f)
+            dist_zoom -= 0.2;
             printf("Zoom is %f\n", dist_zoom);
             break;
         case GLFW_KEY_UP:
@@ -128,19 +151,19 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
             break;
         case GLFW_KEY_U:
             incre += 0.5;
-            printf("incre %f\n", incre);
+            // printf("incre %f\n", incre);
             break;
         case GLFW_KEY_I:
             incre -= 0.5;
-            printf("incre %f\n", incre);
+            //printf("incre %f\n", incre);
             break;
         case GLFW_KEY_LEFT:
-            theta -= 10;
+            theta -= 2;
             printf("theta %f\n", theta);
 
             break;
         case GLFW_KEY_RIGHT:
-            theta += 10;
+            theta += 2;
             printf("theta %f\n", theta);
 
             break;
@@ -182,7 +205,7 @@ void drawCorridor(Corridor corridor)
     float z = -0.5;
     float z2 = -1.;
         glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBindTexture(GL_TEXTURE_2D, textures[10]);
     for (int i = 0; i < 2000; i++)
     {
         //glColor3f((1. / 20.) * i, (1. / 20.) * i, (1. / 20.) * i);
@@ -284,17 +307,18 @@ float easeOutExpo(float x){
     return x == 1 ? 1 : 1-  pow(2,-10*x);
 }
 
-void drawEndTitle(){
+void drawEndTitle(int type){
     static float x = 0;
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // pos y  = 2 -> -1
     glColor4f(1.0,1.0,1.0,x);
-    drawRectangleTextured(9., 3., 0, 2- (easeOutExpo(x)*3), -14, 2, 6, dummyHitbox);
+    if (type == 0){
+        // LOSE Title
+        drawRectangleTextured(9., 3., 0, 2- (easeOutExpo(x)*2), -14, 2, 16, dummyHitbox);
+    }else {
+        // WIN title
+        drawRectangleTextured(9., 3., 0, 2- (easeOutExpo(x)*2), -14, 2, 17, dummyHitbox);
+    }
     x += 0.005;
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ZERO);
 }
 /*
 getProjection(GLfloat hitbox[4][3], GLfloat onWindowHitbox[4][3]){
@@ -334,17 +358,6 @@ void update_screen(GLFWwindow *window, Corridor* corridor)
     update_racket(&(corridor->racket), x_racket, y_racket);
     drawRacket(window, corridor->racket);
     drawCorridor(*corridor);
-
-    /* Ball Rendering with shadow */
-    glColor3f(1.0, 0.0, 0.0);
-    glPushMatrix();
-    glTranslatef(corridor->ball.x, corridor->ball.y, corridor->ball.z);
-    glScalef(0.1, 0.1, 0.1);
-    drawSphere();
-    glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(0.0, 0.0, -4.9 - corridor->ball.z * 10);
-    drawCircle();
-    glPopMatrix();
 
     // drawWall(1.);
 }
@@ -414,25 +427,18 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
         break;
     }
 }
-void glDrawLight(float length) {
-	float hl = length/2.;
-	glColor3f(1.,1.,0.);
-	glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0.,hl,0.);
-		glVertex3f(hl,0.,0.);
-		glVertex3f(0.,0.,hl);
-		glVertex3f(-hl,0.,0.);
-		glVertex3f(0.,0.,-hl);
-		glVertex3f(hl,0.,0.);
-	glEnd();
-	glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(0.,-hl,0.);
-		glVertex3f(hl,0.,0.);
-		glVertex3f(0.,0.,hl);
-		glVertex3f(-hl,0.,0.);
-		glVertex3f(0.,0.,-hl);
-		glVertex3f(hl,0.,0.);
-	glEnd();
+
+void draw_ball(Corridor *corridor){
+        /* Ball Rendering with shadow */
+    glColor3f(1.0, 0.0, 0.0);
+    glPushMatrix();
+    glTranslatef(corridor->ball.x, corridor->ball.y, corridor->ball.z);
+    glScalef(0.1, 0.1, 0.1);
+    drawSphere();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslatef(0.0, 0.0, -4.9 - corridor->ball.z * 10);
+    drawCircle();
+    glPopMatrix();
 }
 
 int main(int argc, char const *argv[])
@@ -467,12 +473,11 @@ int main(int argc, char const *argv[])
 
     /* Texture */
     // Tells how texture is packed (fixed inclined textures problem)
-
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     images_datas = prepareTexture(textures ,nbTextures, texturesPath);
 
-    /* RANDOM */
+    /* RANDOM INIT*/
     srand(time(NULL));
     /*  ----  */
 
@@ -481,6 +486,7 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH_TEST);
 
     Corridor corridor = create_corridor();
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)){
@@ -511,60 +517,76 @@ int main(int argc, char const *argv[])
             // pseudo-Flickering
             if (flickerCount == 0){
             if ( rand() % 20 == 0){
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, dummyHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 13, dummyHitbox);
                 flickerCount += (rand()%4 + 2);
             } else {
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 2, dummyHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 12, dummyHitbox);
             }}else {
-                drawRectangleTextured(9., 3., 0, 2, -14, 2, 3, dummyHitbox);
+                drawRectangleTextured(9., 3., 0, 2, -14, 2, 13, dummyHitbox);
                 flickerCount--;
             }
 
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
 
-            drawRectangleTextured(6., 2., 0, -2,-14., 1, 0, playHitbox);
-            drawRectangleTextured(6., 2., 0, -5, -14, 1, 1, quitHitbox);
+            drawRectangleTextured(6., 2., 0, -2,-14., 1, 10, playHitbox);
+            drawRectangleTextured(6., 2., 0, -5, -14, 1, 11, quitHitbox);
 
             glPopMatrix();
             break;
         case JEU:
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // INIT Light 
+            glEnable(GL_LIGHTING);
+            glEnable(GL_LIGHT1); // Light on Camera
+            glEnable(GL_DEPTH_TEST);
 
             setCamera();
+            
+            float overall_intensity = 0.2;
+            
+            /* BALL LIGHT SOURCE */
+            GLfloat ball_light_ambient[] = { 1, 0.4, 0.4, 1.0 };
+            GLfloat ball_light_diffuse[] = {overall_intensity,overall_intensity,overall_intensity,0.5};
+            GLfloat ball_light_specular[] = { 50, overall_intensity, overall_intensity, 1 };
+            GLfloat ball_light_position[] = { corridor.ball.x, corridor.ball.y, corridor.ball.z, 1 };
+
+            glLightfv(GL_LIGHT0, GL_AMBIENT, ball_light_ambient);
+            glLightfv(GL_LIGHT0, GL_DIFFUSE, ball_light_diffuse);
+            glLightfv(GL_LIGHT0, GL_SPECULAR, ball_light_specular);
+            glLightfv(GL_LIGHT0, GL_POSITION, ball_light_position);
+            glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,0);
+            glLightf(GL_LIGHT0,GL_LINEAR_ATTENUATION,0.0);
+            glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,0.2);
+
+            glEnable(GL_LIGHT0); // Light on ball
+
+
+            /*  CAMERA LIGHT SOURCE*/
+            glGetDoublev(GL_MODELVIEW_MATRIX, modelMat);
+            GLfloat cam_pos[] = { -modelMat[13], -modelMat[14], -modelMat[15]}; 
+            GLfloat light_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+            GLfloat light_diffuse[] = {overall_intensity,overall_intensity,overall_intensity,0.5};
+            GLfloat light_specular[] = { 50, overall_intensity, overall_intensity, 1 };
+
+            glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+            glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+            glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+            glLightfv(GL_LIGHT1, GL_POSITION, cam_pos);
+            glLightf(GL_LIGHT1,GL_CONSTANT_ATTENUATION,0);
+            glLightf(GL_LIGHT1,GL_LINEAR_ATTENUATION,0.0);
+            glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.2);     
+
+
+            drawWalls(corridor);
             update_screen(window, &corridor);
 
-/*
-            	//float theta_light = -M_PI/4.0+global_light*M_PI/50.0;
-	float position[4] = {0, 0, 0, 1};//{10.0f*cosf(theta_light)/sqrtf(2.f),5.0,10.0f*sinf(-theta_light)/sqrtf(2.f),1.0};
-	//float position[4] = {10.0f,0.0,0.0f,1.0};
-	glPushMatrix();
-		glTranslatef(position[0],position[1],position[2]);
-		glDrawLight(0.2);
-	glPopMatrix();
+            glDisable(GL_LIGHT0); // Light on ball stop
+            glDisable(GL_LIGHT1); // Light from Camera stop
+            glDisable(GL_LIGHTING);
+            
+            draw_ball(&corridor); // Ball is unaffected by light
 
-
-GLfloat view[16]; 
-	glGetFloatv(GL_MODELVIEW_MATRIX, view); 
-
-	float overall_intensity = 75.0;
-	float black[4] = {0.0,0.0,0.0,1.0};
-	float spec_intensity[4] = {overall_intensity,0.0,0.0,0.0};
-	float intensite[4] = {overall_intensity,overall_intensity,overall_intensity,0.0};
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
-	glLightfv(GL_LIGHT0,GL_POSITION,position);
-	glLightfv(GL_LIGHT0,GL_AMBIENT,black);
-	glLightfv(GL_LIGHT0,GL_DIFFUSE,intensite);
-	glLightfv(GL_LIGHT0,GL_SPECULAR,spec_intensity);
-	glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
-	glLightf(GL_LIGHT0,GL_LINEAR_ATTENUATION,0.0);
-	glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,M_PI);
-*/
-            drawWalls(corridor);
-
-	//glDisable(GL_LIGHTING);
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
@@ -574,12 +596,9 @@ GLfloat view[16];
             if(clicked && !corridor.pause) {
                 collision_racket_wall(&corridor);
             }
-
             collision_walls(&corridor);
 
-            //fprintf(stdout, "Current timeStep (%d) | Clicked ? %s \n", timeStep, clicked == 1 ? "yes" : "no");
-            if (!interacted) // Si la racket n'interragit pas avec la balle
-            {
+            if (!interacted) {// Si la racket n'interragit pas avec la balle
                 timeStep++;
             }
             else
@@ -590,6 +609,8 @@ GLfloat view[16];
                 right_clicked = 0;
             }
 
+
+            /* UI DISPLAY */
             glPushMatrix();
             glRotatef(90., 0., 1., 0.);
             glRotatef(90., 0., 0., 1.);
@@ -600,24 +621,49 @@ GLfloat view[16];
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             for (int i = 0; i< 10;i++){
                 if (i < corridor.racket.lives  ){
-                drawRectangleTextured(1, 1., 0+i, 0,0.999 , 0.25, 4, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0,0.999 , 0.25, 3, playHitbox);
                 }else {
-                drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 5, playHitbox);
+                drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 4, playHitbox);
                 }
             }
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
-
             glPopMatrix();
+
+
             if ( corridor.racket.lives <=0 ){
                 currentScreen = FIN;
                 glDisable(GL_LIGHTING);
                 }
             break;
+
         case FIN:
             glClearColor(0.0, 0.0, 0.2, 0.0);
             glClear(GL_COLOR_BUFFER_BIT);
-            drawEndTitle();
+
+
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            // Title
+            if ( corridor.racket.lives <=0 ){           
+                drawEndTitle(0);
+            } else {
+                drawEndTitle(1);
+            }
+
+            // show score
+            drawRectangleTextured(400, 100., 0, -2.2,-13, 0.01, 18, playHitbox);
+            int score = 34556; // fake score
+            char ScoreArray[11];
+            sprintf(ScoreArray, "%010d", score);
+            float offset = 0.25;
+            for (int i =0; i <10 ; i++){       
+                drawRectangleTextured(40, 70., offset- 0.5*5, -3,-13, 0.01, ScoreArray[i]-48, playHitbox);
+                offset += 0.5;
+            }
+            glDisable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ZERO);
 
             break;
         }
