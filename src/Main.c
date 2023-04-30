@@ -631,8 +631,7 @@ int main(int argc, char const *argv[])
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
             glPopMatrix();
-
-            printf("corridor rack %f \n", corridor.depth);
+            
             if ( corridor.racket.lives <=0 || corridor.depth >= nbObstacle*2 -2){
                 currentScreen = FIN;
                 glDisable(GL_LIGHTING);
