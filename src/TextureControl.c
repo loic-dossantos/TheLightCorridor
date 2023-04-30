@@ -13,13 +13,13 @@ textureData *prepareTexture(GLuint textures[], const int size, char **texturesPa
     glGenTextures(size, textures);
 
     for (int i = 0; i < size; i++){
-        printf("%s path \n", texturesPath[i]);
+        //printf("%s path \n", texturesPath[i]);
 
         const char *last_four = &texturesPath[i][strlen(texturesPath[i])-4];
-        printf("%s path \n", last_four);
+        //printf("%s path \n", last_four);
         unsigned char *data;
         if ( strcmp(last_four, pngExtension)== 0){
-            printf("%s equals \n", last_four);
+            //printf("%s equals \n", last_four);
             data = stbi_load(texturesPath[i], &datas[i].x, &datas[i].y, &datas[i].n, STBI_rgb_alpha);
         }else {
             data = stbi_load(texturesPath[i], &datas[i].x, &datas[i].y, &datas[i].n, STBI_rgb);
@@ -28,12 +28,8 @@ textureData *prepareTexture(GLuint textures[], const int size, char **texturesPa
             fprintf(stdout, "ERROR texture non chargée\n");
             glfwTerminate();
             return NULL;
-
         }
-        else{
-            fprintf(stdout, " texture chargé sur : %d \n", textures[i]);
-        }
-
+        //fprintf(stdout, " texture chargé sur : %d \n", textures[i]);
         // bind texture object
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

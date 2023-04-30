@@ -21,7 +21,11 @@ void setCamera();
 /* Draw cannonic objet functions */
 void drawSquare();
 
+void drawSquareTx();
+
 void drawRectangle();
+
+void drawRectangleTx();
 
 void drawCircle();
 
