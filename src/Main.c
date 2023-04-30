@@ -486,6 +486,11 @@ int main(int argc, char const *argv[])
 
     Corridor corridor = create_corridor(nbObstacle);
 
+    /* SCORE */
+    int score; // fake score
+    char ScoreArray[11];
+    float numbers_offset;
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)){
@@ -600,12 +605,8 @@ int main(int argc, char const *argv[])
             }
             collision_walls(&corridor);
 
-            if (!interacted) {// Si la racket n'interragit pas avec la balle
-                timeStep++;
-            }
-            else
-            {
-            }
+            timeStep++;
+
             // Reset richtclicked.
             if(right_clicked) {
                 right_clicked = 0;
@@ -628,6 +629,15 @@ int main(int argc, char const *argv[])
                 drawRectangleTextured(1, 1., 0+i, 0, 0.999 , 0.25, 15, playHitbox);
                 }
             }
+            drawRectangleTextured(400, 100., 0.4, -3.75, 0.999, 0.01*0.25, 18, playHitbox);
+            score = corridor.depth*1000; // fake score
+            sprintf(ScoreArray, "%010d", score);
+            numbers_offset = 0.25;
+            for (int i =0; i <10 ; i++){       
+                drawRectangleTextured(40, 70., numbers_offset, -4, 0.999 , 0.01*0.25, ScoreArray[i]-48, playHitbox);
+                numbers_offset += 0.1;
+            }
+
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
             glPopMatrix();
@@ -654,14 +664,14 @@ int main(int argc, char const *argv[])
             }
 
             // show score
+            
+            glColor3f(1.0,1.0,1.0);
             drawRectangleTextured(400, 100., 0, -2.2,-13, 0.01, 18, playHitbox);
-            int score = 34556; // fake score
-            char ScoreArray[11];
             sprintf(ScoreArray, "%010d", score);
-            float offset = 0.25;
+            numbers_offset = 0.25;
             for (int i =0; i <10 ; i++){       
-                drawRectangleTextured(40, 70., offset- 0.5*5, -3,-13, 0.01, ScoreArray[i]-48, playHitbox);
-                offset += 0.5;
+                drawRectangleTextured(40, 70., numbers_offset- 0.5*5, -3,-13, 0.01, ScoreArray[i]-48, playHitbox);
+                numbers_offset += 0.5;
             }
             glDisable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ZERO);
