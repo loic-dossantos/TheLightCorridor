@@ -23,6 +23,7 @@ Wall random_wall(double depth) {
 		case 5: return quarter_right_wall(depth);
 		case 6: return third_middle_wall_horizontal(depth);
 		case 7: return third_middle_wall_vertical(depth);
+		default : return half_right_wall(depth);;
 	}
 }
 

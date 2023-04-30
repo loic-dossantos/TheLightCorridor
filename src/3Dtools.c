@@ -35,7 +35,7 @@ void drawSquareTx() {
 		glVertex3f(0.5,-0.5,0.0);
 		glTexCoord3f(1, 1, 0);
 		glVertex3f(0.5,0.5,0.0);
-		glTexCoord3f(1, 1, 0);
+		glTexCoord3f(0, 1, 0);
 		glVertex3f(-0.5,0.5,0.0);
 	glEnd();
 }
@@ -55,7 +55,7 @@ void drawRectangleTx() {
 	glVertex3f(0.5,-1.0,0.0);
     glTexCoord3f(1, 1, 0);
 	glVertex3f(0.5,1.0,0.0);
-    glTexCoord3f(1, 1, 0);
+    glTexCoord3f(0, 1, 0);
 	glVertex3f(-0.5,1.0,0.0);
 	glEnd();
 }

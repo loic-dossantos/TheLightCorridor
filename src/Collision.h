@@ -20,7 +20,7 @@ void collision_corridor(Corridor* corridor);
 int check_collision_racket_wall(Corridor *corridor);
 
 /* Handle the collision between Racket and Walls. */
-void collision_racket_wall(Corridor *corridor);
+int collision_racket_wall(Corridor *corridor);
 
 /* Handle the collision of the the Ball with the Walls. */
 void collision_walls(Corridor* corridor);

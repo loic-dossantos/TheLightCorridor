@@ -5,7 +5,7 @@
 static const unsigned int WINDOW_WIDTH = 1200;
 static const unsigned int WINDOW_HEIGHT = 600;
 static const char WINDOW_TITLE[] = "The Light Corridor";
-static float aspectRatio = WINDOW_WIDTH / (float) WINDOW_HEIGHT;
+//static float aspectRatio = WINDOW_WIDTH / (float) WINDOW_HEIGHT;
 
 /* Minimal time wanted between two images */
 static const double FRAMERATE_IN_SECONDS = 1. / 30.;

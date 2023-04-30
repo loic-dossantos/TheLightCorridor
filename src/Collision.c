@@ -59,12 +59,14 @@ int check_collision_racket_wall(Corridor *corridor) {
     return 0;
 }
 
-void collision_racket_wall(Corridor *corridor) {
+int collision_racket_wall(Corridor *corridor) {
     if(!check_collision_racket_wall(corridor)) {
         corridor->depth += 0.05;
         for(int i = 0; i < corridor->number_of_walls;i++) {
             corridor->walls[i].x += 0.05;
         }
         corridor->ball.x += 0.05;
+        return 1;
     }
+    return 0;
 }

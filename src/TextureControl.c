@@ -33,6 +33,7 @@ textureData *prepareTexture(GLuint textures[], const int size, char **texturesPa
         // bind texture object
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
         if (datas[i].n == 3){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, datas[i].x, datas[i].y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         }else if  (datas[i].n == 4) {
