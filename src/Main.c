@@ -559,7 +559,7 @@ int main(int argc, char const *argv[])
             glLightf(GL_LIGHT0,GL_LINEAR_ATTENUATION,0.0);
             glLightf(GL_LIGHT0,GL_QUADRATIC_ATTENUATION,0.2);
 
-            //glEnable(GL_LIGHT0); // Light on ball
+            glEnable(GL_LIGHT0); // Light on ball
 
 
             /*  CAMERA LIGHT SOURCE*/
