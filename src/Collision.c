@@ -91,6 +91,7 @@ void collision_racket_bonus(Corridor *corridor) {
             switch(bonus.type) {
                 case MORELIFE: corridor->racket.lives++; break;
                 case STICKY: corridor->racket.sticky = 1; break;
+                case EXP : corridor->racket.exp = 41; break;
             }
             corridor->bonus[i].z = 5;
         }

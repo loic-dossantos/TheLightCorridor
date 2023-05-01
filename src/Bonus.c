@@ -17,9 +17,10 @@ Bonus random_bonus(double depth) {
 	x = ((rand() % 9) - 4.) / 10.;
 	y = ((rand() % 19) - 9.) / 10.;
 
-	switch(rand() % 2) {
+	switch(rand() % 3) {
 		case 0: return init_bonus(x,y,depth,MORELIFE);
 		case 1: return init_bonus(x,y,depth,STICKY);
+		case 2: return init_bonus(x,y,depth,EXP);
 		default: return init_bonus(0,0,0,0);
 	}
 }

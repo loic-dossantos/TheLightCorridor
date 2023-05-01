@@ -14,6 +14,7 @@ typedef struct {
 	double side;
 	int lives;
 	int sticky;
+	int exp;
 } Racket;
 
 /* Initialise the Racket. */

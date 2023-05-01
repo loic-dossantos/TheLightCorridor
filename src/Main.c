@@ -22,8 +22,8 @@
 
 /* RANDOM */
 int flickerCount = 0;
+float incre=0;
 
-float incre = 0;
 /* INTERRACTION */
 GLdouble modelMat[16];
 GLdouble projectionMat[16];
@@ -116,59 +116,58 @@ void onKey(GLFWwindow *window, int key, int scancode, int action, int mods)
             glDisable(GL_TEXTURE_2D);
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
-        case GLFW_KEY_L:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            break;
-        case GLFW_KEY_P:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            break;
         case GLFW_KEY_ENTER:
-        if (currentScreen == MENU){
+            if (currentScreen == MENU){
                 currentScreen = JEU;
                 theta = 0.0f; // Angle between x axis and viewpoint
                 phy = 90.0f; // Angle between z axis and viewpoint
                 dist_zoom = 1.0f; // Distance between origin and viewpoint
+            }
+            break;
+        // case GLFW_KEY_L:
+        //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //     break;
+        // case GLFW_KEY_P:
+        //     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //     break;
+        // case GLFW_KEY_J:
+        //     if (dist_zoom < 100.0f)
+        //         dist_zoom += 0.2;
+        //     printf("Zoom is %f\n", dist_zoom);
+        //     break;
+        // case GLFW_KEY_H:
+        //     //if (dist_zoom > 1.0f)
+        //     dist_zoom -= 0.2;
+        //     printf("Zoom is %f\n", dist_zoom);
+        //     break;
+        // case GLFW_KEY_UP:
+        //     if (phy > 0)
+        //         phy -= 2;
+        //     printf("Phy %f\n", phy);
+        //     break;
+        // case GLFW_KEY_DOWN:
+        //     if (phy <= 178.)
+        //         phy += 2;
+        //     printf("Phy %f\n", phy);
+        //     break;
+        // case GLFW_KEY_U:
+        //     incre += 0.5;
+        //     // printf("incre %f\n", incre);
+        //     break;
+        // case GLFW_KEY_I:
+        //     incre -= 0.5;
+        //     //printf("incre %f\n", incre);
+        //     break;
+        // case GLFW_KEY_LEFT:
+        //     theta -= 2;
+        //     printf("theta %f\n", theta);
 
-        }
-            break;
-        case GLFW_KEY_J:
-            if (dist_zoom < 100.0f)
-                dist_zoom += 0.2;
-            printf("Zoom is %f\n", dist_zoom);
-            break;
-        case GLFW_KEY_H:
-            //if (dist_zoom > 1.0f)
-            dist_zoom -= 0.2;
-            printf("Zoom is %f\n", dist_zoom);
-            break;
-        case GLFW_KEY_UP:
-            if (phy > 0)
-                phy -= 2;
-            printf("Phy %f\n", phy);
-            break;
-        case GLFW_KEY_DOWN:
-            if (phy <= 178.)
-                phy += 2;
-            printf("Phy %f\n", phy);
-            break;
-        case GLFW_KEY_U:
-            incre += 0.5;
-            // printf("incre %f\n", incre);
-            break;
-        case GLFW_KEY_I:
-            incre -= 0.5;
-            //printf("incre %f\n", incre);
-            break;
-        case GLFW_KEY_LEFT:
-            theta -= 2;
-            printf("theta %f\n", theta);
+        //     break;
+        // case GLFW_KEY_RIGHT:
+        //     theta += 2;
+        //     printf("theta %f\n", theta);
 
-            break;
-        case GLFW_KEY_RIGHT:
-            theta += 2;
-            printf("theta %f\n", theta);
-
-            break;
+        //     break;
         default:
             fprintf(stdout, "Touche non gérée (%d)\n", key);
         }
@@ -192,12 +191,21 @@ void drawRacket(GLFWwindow *window, Racket racket)
     glPushMatrix();
     glRotatef(90., 0., 1., 0.);
     glScalef(1.0, 1.0, 1.0);
-    if(racket.sticky) {
-        glColor3f(1., 1., 0.);
-    }
-    else {
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    if ( !racket.sticky && !racket.exp){
         glColor3f(1., 1., 1.);    
     }
+    else  {
+        if (racket.sticky){
+            b = 1;
+        }
+        if (racket.exp){
+            g = 1;
+        }
+         glColor3f(r,g,b); 
+    } 
     glBegin(GL_LINE_LOOP);
     glVertex3f(racket.x - racket.side, racket.y - racket.side, racket.z);
     glVertex3f(racket.x + racket.side, racket.y - racket.side, racket.z);
@@ -285,8 +293,10 @@ void drawBonus(Corridor corridor) {
             glScalef(0.1,0.1,0.1);
             if (bonus.type == MORELIFE){
                 glColor3f(1, 0, 0);
-            }else {
-                glColor3f(1, 1, 0);
+            }else if (bonus.type == EXP) {
+                glColor3f(0, 1, 0);
+            }else if (bonus.type == STICKY) {
+                glColor3f(0, 0, 1);
             }
             drawSquare();
             glColor3f(1, 1, 1);
@@ -387,11 +397,7 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
     case MENU:
         if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
         {
-            fprintf(stdout, " Clicked %f || %f \n", x, y);
-            fflush(stdout);
             if (x > -1.7 && x < 1.7 && y < -1.2 && y > -3.5){
-                fprintf(stdout, "Clicked on Play\n");
-                fflush(stdout);
                 currentScreen = JEU;
                 theta = 0.0f; // Angle between x axis and viewpoint
                 phy = 90.0f; // Angle between z axis and viewpoint
@@ -399,8 +405,6 @@ void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
                 glDisable(GL_TEXTURE_2D);
             }
             if (x > -1.7 && x < 1.7 && y < -4.7 && y > -7.0){
-                fprintf(stdout, "Clicked on Quit\n");
-                fflush(stdout);
                 freeTextures(textures, images_datas, nbTextures);
                 glDisable(GL_TEXTURE_2D);
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -484,7 +488,7 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH_TEST);
 
     /* CORRIDOR */
-    int nbObstacle = 50; // doit être plus que 9
+    int nbObstacle = 10; // doit être plus que 9
     int nbBonus = 1 + nbObstacle / 10;
 
     Corridor corridor = create_corridor(nbObstacle, nbBonus);
@@ -609,7 +613,8 @@ int main(int argc, char const *argv[])
             if(clicked && !corridor.pause && corridor.ball.move_x != 0) {
                 if (collision_racket_wall(&corridor)){
                     // SCORE GAIN CAN BE MODIFIED WITH BONUS
-                    score += 50;
+                    corridor.racket.exp <1? 0 : corridor.racket.exp--;
+                    score += 50 * ( corridor.racket.exp ? 2 : 1);
                 }
             }
             collision_walls(&corridor);
@@ -660,8 +665,6 @@ int main(int argc, char const *argv[])
         case FIN:
             glClearColor(0.0, 0.0, 0.2, 0.0);
             glClear(GL_COLOR_BUFFER_BIT);
-
-
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

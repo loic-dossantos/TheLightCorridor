@@ -9,6 +9,7 @@ Racket init_racket(double side) {
 	racket.side = side;
 	racket.lives = 5;
 	racket.sticky = 0;
+	racket.exp = 0;
 
 	return racket;
 }

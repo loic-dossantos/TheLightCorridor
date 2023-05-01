@@ -6,7 +6,8 @@
 
 typedef enum {
 	MORELIFE,
-	STICKY
+	STICKY, 
+	EXP
 } BonusType;
 
 typedef struct {
