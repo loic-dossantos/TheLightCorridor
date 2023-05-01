@@ -10,7 +10,7 @@ OBJDIR	= obj/
 # Names of executable and objects
 EXEC = LightCorridor
 
-OBJ = $(OBJDIR)Main.o $(OBJDIR)Racket.o $(OBJDIR)Ball.o $(OBJDIR)WindowConfig.o $(OBJDIR)3Dtools.o $(OBJDIR)Collision.o $(OBJDIR)TextureControl.o $(OBJDIR)Corridor.o $(OBJDIR)Wall.o
+OBJ = $(OBJDIR)Main.o $(OBJDIR)Racket.o $(OBJDIR)Ball.o $(OBJDIR)WindowConfig.o $(OBJDIR)3Dtools.o $(OBJDIR)Collision.o $(OBJDIR)TextureControl.o $(OBJDIR)Corridor.o $(OBJDIR)Wall.o $(OBJDIR)Bonus.o
 
 $(BINDIR)$(EXEC): $(OBJ)
 	@mkdir -p $(BINDIR)
@@ -20,9 +20,11 @@ $(OBJDIR)Main.o: $(SRCDIR)Main.c $(SRCDIR)3Dtools.h $(SRCDIR)Racket.h $(SRCDIR)B
 
 $(OBJDIR)Collision.o: $(SRCDIR)Collision.c $(SRCDIR)Collision.h $(SRCDIR)Racket.h $(SRCDIR)Ball.h $(SRCDIR)Corridor.h
 
-$(OBJDIR)Corridor.o: $(SRCDIR)Corridor.c $(SRCDIR)Corridor.h $(SRCDIR)Racket.h $(SRCDIR)Ball.h $(SRCDIR)Wall.h 
+$(OBJDIR)Corridor.o: $(SRCDIR)Corridor.c $(SRCDIR)Corridor.h $(SRCDIR)Racket.h $(SRCDIR)Ball.h $(SRCDIR)Wall.h $(SRCDIR)Bonus.h
 
 $(OBJDIR)3Dtools.o: $(SRCDIR)3Dtools.c $(SRCDIR)3Dtools.h
+
+$(OBJDIR)Bonus.o: $(SRCDIR)Bonus.c $(SRCDIR)Bonus.h
 
 $(OBJDIR)Wall.o: $(SRCDIR)Wall.c $(SRCDIR)Wall.h
 

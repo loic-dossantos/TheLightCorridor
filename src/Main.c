@@ -71,8 +71,7 @@ char *texturesPath[nbTextures] = {
 /* Game variable */
 
 static int timeStep = 0;
-static int clicked = 0;
-static int interacted = 0;    
+static int clicked = 0;  
 
 /* INTERFACE */
 typedef enum{
@@ -93,7 +92,7 @@ void onError(int error, const char *description)
 
 void onWindowResized(GLFWwindow *window, int width, int height)
 {
-    aspectRatio = width / (float)height;
+    float aspectRatio = width / (float)height;
 
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -190,7 +189,12 @@ void drawRacket(GLFWwindow *window, Racket racket)
     glPushMatrix();
     glRotatef(90., 0., 1., 0.);
     glScalef(1.0, 1.0, 1.0);
-    glColor3f(1, 1, 1);
+    if(racket.sticky) {
+        glColor3f(1., 0., 0.);
+    }
+    else {
+        glColor3f(1., 1., 1.);    
+    }
     glBegin(GL_LINE_LOOP);
     glVertex3f(racket.x - racket.side, racket.y - racket.side, racket.z);
     glVertex3f(racket.x + racket.side, racket.y - racket.side, racket.z);
@@ -252,6 +256,21 @@ void drawWalls(Corridor corridor) {
             glTranslatef(wall.z, wall.y, wall.x);
             glScalef(wall.x_scale, wall.y_scale, 1.0);
             glColor3f(0, 0, 0.7);
+            drawSquare();
+            glColor3f(1, 1, 1);
+        glPopMatrix();
+    }
+}
+
+void drawBonus(Corridor corridor) {
+    for(int i = 0; i < corridor.number_of_bonus; i++) {
+        Bonus bonus = corridor.bonus[i];
+        glPushMatrix();
+            glRotatef(90., 0., 1., 0.);
+            glTranslatef(bonus.x, bonus.y, bonus.z);
+            glRotatef(45., 0., 0., 1.);
+            glScalef(0.1,0.1,0.1);
+            glColor3f(0, 0.5, 0);
             drawSquare();
             glColor3f(1, 1, 1);
         glPopMatrix();
@@ -346,17 +365,23 @@ getProjection(GLfloat hitbox[4][3], GLfloat onWindowHitbox[4][3]){
 
 void update_screen(GLFWwindow *window, Corridor* corridor)
 {
-    double x, y, x_racket, y_racket;
+    double x, y, x_racket, y_racket, x_diff, y_diff;
 
     glfwGetCursorPos(window, &x, &y);
     x_racket = (y / WINDOW_HEIGHT) - 0.5;
     y_racket = (x / WINDOW_HEIGHT) - 1.;
 
+    x_diff = corridor->racket.x - (y / WINDOW_HEIGHT - 0.5);
+    y_diff = corridor->racket.y - (x / WINDOW_HEIGHT - 1.);
+
+    if(corridor->racket.sticky && check_collision_racket(*corridor) && corridor->ball.move_x == 0 && corridor->pause == 0) {
+        corridor->ball.z += x_diff;
+        corridor->ball.y -= y_diff;
+    }
+
     update_racket(&(corridor->racket), x_racket, y_racket);
     drawRacket(window, corridor->racket);
     drawCorridor(*corridor);
-
-    // drawWall(1.);
 }
 
 void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
@@ -483,8 +508,9 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH_TEST);
 
     int nbObstacle = 10; // doit être plus que 9
+    int nbBonus = 1 + nbObstacle / 10;
 
-    Corridor corridor = create_corridor(nbObstacle);
+    Corridor corridor = create_corridor(nbObstacle, nbBonus);
 
     /* SCORE */
     int score; // fake score
@@ -514,7 +540,6 @@ int main(int argc, char const *argv[])
             setCamera();
 
             glPushMatrix();
-
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -582,10 +607,10 @@ int main(int argc, char const *argv[])
             glLightfv(GL_LIGHT1, GL_POSITION, cam_pos);
             glLightf(GL_LIGHT1,GL_CONSTANT_ATTENUATION,0);
             glLightf(GL_LIGHT1,GL_LINEAR_ATTENUATION,0);
-            glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.1);     
-
+            glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.1);
 
             drawWalls(corridor);
+            drawBonus(corridor);
             update_screen(window, &corridor);
 
             glDisable(GL_LIGHT0); // Light on ball stop
@@ -597,13 +622,19 @@ int main(int argc, char const *argv[])
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
+            if(corridor.racket.sticky && right_clicked && corridor.ball.move_x == 0.) {
+                corridor.ball.move_x = -0.05;
+                corridor.ball.move_y = (-(corridor.racket.y - corridor.ball.y) * 4.5) / 40.;
+                corridor.ball.move_z = ((corridor.racket.x - corridor.ball.z) * 4.5) / 40.;
+            }
             if(corridor.pause && right_clicked) {
                 unpause(&corridor);
             }
-            if(clicked && !corridor.pause) {
+            if(clicked && !corridor.pause && corridor.ball.move_x != 0) {
                 collision_racket_wall(&corridor);
             }
             collision_walls(&corridor);
+            collision_racket_bonus(&corridor);
 
             timeStep++;
 

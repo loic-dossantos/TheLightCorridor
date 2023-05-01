@@ -38,7 +38,7 @@ void level_one(Corridor* corridor, int level) {
 	corridor->number_of_walls = 9;
 }
 
-Corridor create_corridor(int nb) {
+Corridor create_corridor(int nb, int nb_bonus) {
 	Corridor corridor;
 
 	corridor = init_corridor();
@@ -48,6 +48,11 @@ Corridor create_corridor(int nb) {
 		corridor.walls[i] = random_wall(-14. - 2. * ((float)i-9.));
 	}
 	corridor.number_of_walls = nb;
+
+	for(int i = 0; i < nb_bonus; i++) {
+		corridor.bonus[i] = random_bonus(-1. + (i * -14.));
+	}
+	corridor.number_of_bonus = nb_bonus;
 
 	return corridor;
 }

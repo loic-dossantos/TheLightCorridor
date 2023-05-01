@@ -25,4 +25,7 @@ void collision_racket_wall(Corridor *corridor);
 /* Handle the collision of the the Ball with the Walls. */
 void collision_walls(Corridor* corridor);
 
+/* Handle the collision of the the Ball with the Bonus. */
+void collision_racket_bonus(Corridor*corridor);
+
 #endif
