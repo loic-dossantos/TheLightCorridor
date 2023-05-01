@@ -192,7 +192,12 @@ void drawRacket(GLFWwindow *window, Racket racket)
     glPushMatrix();
     glRotatef(90., 0., 1., 0.);
     glScalef(1.0, 1.0, 1.0);
-    glColor3f(1, 1, 1);
+    if(racket.sticky) {
+        glColor3f(1., 0., 0.);
+    }
+    else {
+        glColor3f(1., 1., 1.);    
+    }
     glBegin(GL_LINE_LOOP);
     glVertex3f(racket.x - racket.side, racket.y - racket.side, racket.z);
     glVertex3f(racket.x + racket.side, racket.y - racket.side, racket.z);
@@ -269,6 +274,21 @@ void drawWalls(Corridor corridor) {
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
 }
+
+void drawBonus(Corridor corridor) {
+    for(int i = 0; i < corridor.number_of_bonus; i++) {
+        Bonus bonus = corridor.bonus[i];
+        glPushMatrix();
+            glRotatef(90., 0., 1., 0.);
+            glTranslatef(bonus.x, bonus.y, bonus.z);
+            glRotatef(45., 0., 0., 1.);
+            glScalef(0.1,0.1,0.1);
+            glColor3f(0, 0.5, 0);
+            drawSquare();
+            glColor3f(1, 1, 1);
+        glPopMatrix();
+    }
+}
     
 void drawRectangleTextured(float x_length, float y_length, float x_offset, float y_offset,float z_offset, float scale, int textuID,GLfloat hitbox[][3]){
 
@@ -332,16 +352,23 @@ void drawEndTitle(int type){
 
 void update_screen(GLFWwindow *window, Corridor* corridor)
 {
-    double x, y, x_racket, y_racket;
+    double x, y, x_racket, y_racket, x_diff, y_diff;
 
     glfwGetCursorPos(window, &x, &y);
     x_racket = (y / WINDOW_HEIGHT) - 0.5;
     y_racket = (x / WINDOW_HEIGHT) - 1.;
 
+    x_diff = corridor->racket.x - (y / WINDOW_HEIGHT - 0.5);
+    y_diff = corridor->racket.y - (x / WINDOW_HEIGHT - 1.);
+
+    if(corridor->racket.sticky && check_collision_racket(*corridor) && corridor->ball.move_x == 0 && corridor->pause == 0) {
+        corridor->ball.z += x_diff;
+        corridor->ball.y -= y_diff;
+    }
+
     update_racket(&(corridor->racket), x_racket, y_racket);
     drawRacket(window, corridor->racket);
     drawCorridor(*corridor);
-
 }
 
 void mouse_click_callback(GLFWwindow *window, int key, int action, int mods){
@@ -455,8 +482,9 @@ int main(int argc, char const *argv[])
 
     /* CORRIDOR */
     int nbObstacle = 10; // doit être plus que 9
+    int nbBonus = 1 + nbObstacle / 10;
 
-    Corridor corridor = create_corridor(nbObstacle);
+    Corridor corridor = create_corridor(nbObstacle, nbBonus);
 
     /* SCORE */
     int score = 0;
@@ -485,7 +513,6 @@ int main(int argc, char const *argv[])
             glClear(GL_COLOR_BUFFER_BIT);
             //setCamera()
             glPushMatrix();
-
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -554,6 +581,7 @@ int main(int argc, char const *argv[])
             glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.1);     
 
             drawWalls(corridor);
+            drawBonus(corridor);
             update_screen(window, &corridor);
 
             glDisable(GL_LIGHT0); // Light on ball stop
@@ -565,6 +593,11 @@ int main(int argc, char const *argv[])
             update_ball(&(corridor.ball));
             collision_racket(&corridor);
             collision_corridor(&corridor);
+            if(corridor.racket.sticky && right_clicked && corridor.ball.move_x == 0.) {
+                corridor.ball.move_x = -0.05;
+                corridor.ball.move_y = (-(corridor.racket.y - corridor.ball.y) * 4.5) / 40.;
+                corridor.ball.move_z = ((corridor.racket.x - corridor.ball.z) * 4.5) / 40.;
+            }
             if(corridor.pause && right_clicked) {
                 unpause(&corridor);
             }
@@ -574,7 +607,11 @@ int main(int argc, char const *argv[])
                     score += 50;
                 }
             }
+            if(clicked && !corridor.pause && corridor.ball.move_x != 0) {
+                collision_racket_wall(&corridor);
+            }
             collision_walls(&corridor);
+            collision_racket_bonus(&corridor);
 
             timeStep++;
 
