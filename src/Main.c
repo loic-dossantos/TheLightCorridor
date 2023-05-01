@@ -193,7 +193,7 @@ void drawRacket(GLFWwindow *window, Racket racket)
     glRotatef(90., 0., 1., 0.);
     glScalef(1.0, 1.0, 1.0);
     if(racket.sticky) {
-        glColor3f(1., 0., 0.);
+        glColor3f(1., 1., 0.);
     }
     else {
         glColor3f(1., 1., 1.);    
@@ -283,7 +283,11 @@ void drawBonus(Corridor corridor) {
             glTranslatef(bonus.x, bonus.y, bonus.z);
             glRotatef(45., 0., 0., 1.);
             glScalef(0.1,0.1,0.1);
-            glColor3f(0, 0.5, 0);
+            if (bonus.type == MORELIFE){
+                glColor3f(1, 0, 0);
+            }else {
+                glColor3f(1, 1, 0);
+            }
             drawSquare();
             glColor3f(1, 1, 1);
         glPopMatrix();
@@ -367,7 +371,6 @@ void update_screen(GLFWwindow *window, Corridor* corridor)
     }
 
     update_racket(&(corridor->racket), x_racket, y_racket);
-    drawRacket(window, corridor->racket);
     drawCorridor(*corridor);
 }
 
@@ -481,7 +484,7 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH_TEST);
 
     /* CORRIDOR */
-    int nbObstacle = 10; // doit être plus que 9
+    int nbObstacle = 50; // doit être plus que 9
     int nbBonus = 1 + nbObstacle / 10;
 
     Corridor corridor = create_corridor(nbObstacle, nbBonus);
@@ -581,13 +584,15 @@ int main(int argc, char const *argv[])
             glLightf(GL_LIGHT1,GL_QUADRATIC_ATTENUATION,0.1);     
 
             drawWalls(corridor);
-            drawBonus(corridor);
             update_screen(window, &corridor);
 
             glDisable(GL_LIGHT0); // Light on ball stop
             glDisable(GL_LIGHT1); // Light from Camera stop
             glDisable(GL_LIGHTING);
 
+
+            drawRacket(window, corridor.racket);
+            drawBonus(corridor);
             draw_ball(&corridor); // Ball is unaffected by light
 
             update_ball(&(corridor.ball));
@@ -601,14 +606,11 @@ int main(int argc, char const *argv[])
             if(corridor.pause && right_clicked) {
                 unpause(&corridor);
             }
-            if(clicked && !corridor.pause) {
+            if(clicked && !corridor.pause && corridor.ball.move_x != 0) {
                 if (collision_racket_wall(&corridor)){
                     // SCORE GAIN CAN BE MODIFIED WITH BONUS
                     score += 50;
                 }
-            }
-            if(clicked && !corridor.pause && corridor.ball.move_x != 0) {
-                collision_racket_wall(&corridor);
             }
             collision_walls(&corridor);
             collision_racket_bonus(&corridor);
