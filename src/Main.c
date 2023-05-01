@@ -488,7 +488,7 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH_TEST);
 
     /* CORRIDOR */
-    int nbObstacle = 10; // doit être plus que 9
+    int nbObstacle = 50; // doit être plus que 9
     int nbBonus = 1 + nbObstacle / 10;
 
     Corridor corridor = create_corridor(nbObstacle, nbBonus);
@@ -678,7 +678,7 @@ int main(int argc, char const *argv[])
             // DISPLAY SCORE at bottom left
             glColor3f(1.0,1.0,1.0);
             drawRectangleTextured(400, 100., 0, -2.2,-13, 0.01, 18, playHitbox);
-            sprintf(ScoreArray, "%010d", score);
+            sprintf(ScoreArray, "%010d", score + corridor.racket.lives * 20000);
             numbers_offset = 0.25;
             for (int i =0; i <10 ; i++){       
                 drawRectangleTextured(40, 70., numbers_offset- 0.5*5, -3,-13, 0.01, ScoreArray[i]-48, playHitbox);
