@@ -13,6 +13,7 @@ typedef struct {
 	double z;
 	double side;
 	int lives;
+	int sticky;
 } Racket;
 
 /* Initialise the Racket. */

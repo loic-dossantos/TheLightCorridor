@@ -8,6 +8,7 @@ Racket init_racket(double side) {
 	racket.z = 0.129;
 	racket.side = side;
 	racket.lives = 5;
+	racket.sticky = 0;
 
 	return racket;
 }
